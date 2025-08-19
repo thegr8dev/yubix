@@ -15,7 +15,7 @@ interface SliderProps {
   priority?: boolean
 }
 
-export default function ImageSlider({ images, autoPlay = true, autoPlayInterval = 5000, priority = false }: SliderProps) {
+export default function ImageSlider({ images, autoPlay = true, autoPlayInterval = 5000 }: SliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [touchStart, setTouchStart] = useState<number | null>(null)
@@ -164,7 +164,7 @@ export default function ImageSlider({ images, autoPlay = true, autoPlayInterval 
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 hover:scale-110 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-30 group"
+        className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-gray-900 bg-opacity-20 hover:bg-opacity-40 hover:scale-110 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-30 group"
         aria-label="Previous slide"
       >
         <svg className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,7 +174,7 @@ export default function ImageSlider({ images, autoPlay = true, autoPlayInterval 
 
       <button
         onClick={nextSlide}
-        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 hover:scale-110 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-30 group"
+        className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-gray-900 bg-opacity-20 hover:bg-opacity-40 hover:scale-110 text-white p-2 sm:p-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-30 group"
         aria-label="Next slide"
       >
         <svg className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-0.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,7 +185,7 @@ export default function ImageSlider({ images, autoPlay = true, autoPlayInterval 
       {/* Play/Pause Button */}
       <button
         onClick={() => setIsPaused(!isPaused)}
-        className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white bg-opacity-20 hover:bg-opacity-40 hover:scale-110 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-30"
+        className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-gray-900 bg-opacity-20 hover:bg-opacity-40 hover:scale-110 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-30"
         aria-label={isPaused ? 'Play slideshow' : 'Pause slideshow'}
       >
         {isPaused ? (

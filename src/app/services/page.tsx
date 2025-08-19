@@ -1,402 +1,915 @@
-export default function Services() {
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+
+// Custom hook for intersection observer
+const useIntersectionObserver = (options = {}) => {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+    }, options);
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [options]);
+
+  return { ref, isIntersecting };
+};
+
+// Service data
+const services = [
+  {
+    id: 'security-advisory',
+    title: 'Advanced Security Advisory',
+    subtitle: 'Strategic Security Consultation',
+    description: 'Comprehensive security assessments and strategic planning tailored to your organizational needs.',
+    icon: '🛡️',
+    color: 'from-blue-600 to-cyan-600',
+    features: [
+      'Threat landscape analysis',
+      'Vulnerability assessments',
+      'Security policy development',
+      'Compliance frameworks',
+      'Risk management strategies',
+      'Incident response planning'
+    ],
+    deliverables: [
+      'Comprehensive security audit report',
+      'Custom security framework',
+      'Implementation roadmap',
+      'Policy documentation'
+    ],
+    duration: '4-12 weeks',
+    price: 'From $15,000'
+  },
+  {
+    id: 'custom-development',
+    title: 'Custom Feature Development',
+    subtitle: 'Tailored Security Solutions',
+    description: 'Bespoke security features and integrations designed specifically for your platform requirements.',
+    icon: '⚙️',
+    color: 'from-purple-600 to-pink-600',
+    features: [
+      'Custom API integrations',
+      'Platform-specific modules',
+      'Third-party connectors',
+      'Automated workflows',
+      'Advanced analytics',
+      'Real-time monitoring'
+    ],
+    deliverables: [
+      'Custom feature modules',
+      'Integration documentation',
+      'Testing suite',
+      'Deployment guide'
+    ],
+    duration: '6-16 weeks',
+    price: 'From $25,000'
+  },
+  {
+    id: 'ai-integration',
+    title: 'AI Module Integration',
+    subtitle: 'Human First. AI Enhanced',
+    description: 'Advanced AI capabilities seamlessly integrated into your existing security infrastructure.',
+    icon: '🤖',
+    color: 'from-green-600 to-emerald-600',
+    features: [
+      'Threat pattern recognition',
+      'Predictive analytics',
+      'Automated response systems',
+      'Natural language processing',
+      'Behavioral analysis',
+      'Machine learning models'
+    ],
+    deliverables: [
+      'AI module implementation',
+      'Training data sets',
+      'Performance metrics',
+      'Continuous learning setup'
+    ],
+    duration: '8-20 weeks',
+    price: 'From $40,000'
+  },
+  {
+    id: 'simulations-drills',
+    title: 'Simulations & Drills',
+    subtitle: 'Practical Security Training',
+    description: 'Realistic security simulations and emergency response drills to test and improve readiness.',
+    icon: '🎯',
+    color: 'from-orange-600 to-red-600',
+    features: [
+      'Cyber attack simulations',
+      'Emergency response drills',
+      'Tabletop exercises',
+      'Red team assessments',
+      'Crisis management scenarios',
+      'Performance evaluation'
+    ],
+    deliverables: [
+      'Simulation reports',
+      'Performance analytics',
+      'Improvement recommendations',
+      'Training materials'
+    ],
+    duration: '2-8 weeks',
+    price: 'From $8,000'
+  },
+  {
+    id: 'executive-training',
+    title: 'Executive Training',
+    subtitle: 'Leadership Security Awareness',
+    description: 'Specialized training programs for executives and senior leadership teams.',
+    icon: '🎓',
+    color: 'from-indigo-600 to-purple-600',
+    features: [
+      'Executive briefings',
+      'Board-level presentations',
+      'Strategic decision making',
+      'Crisis leadership',
+      'Regulatory compliance',
+      'Industry best practices'
+    ],
+    deliverables: [
+      'Training curriculum',
+      'Executive playbooks',
+      'Decision frameworks',
+      'Certification programs'
+    ],
+    duration: '1-4 weeks',
+    price: 'From $12,000'
+  }
+];
+
+// Service packages
+const packages = [
+  {
+    name: 'Starter',
+    price: '$5,000',
+    period: '/month',
+    description: 'Essential security services for small organizations',
+    features: [
+      'Basic security assessment',
+      'Monthly vulnerability scans',
+      'Email support',
+      'Standard documentation',
+      'Basic training materials'
+    ],
+    color: 'from-blue-600 to-cyan-600',
+    popular: false
+  },
+  {
+    name: 'Professional',
+    price: '$15,000',
+    period: '/month',
+    description: 'Comprehensive security solutions for growing businesses',
+    features: [
+      'Advanced security advisory',
+      'Custom feature development',
+      'Priority support',
+      'Quarterly reviews',
+      'Executive briefings',
+      'Compliance assistance'
+    ],
+    color: 'from-purple-600 to-pink-600',
+    popular: true
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    period: 'pricing',
+    description: 'Full-scale security ecosystem for large organizations',
+    features: [
+      'Complete platform integration',
+      'AI module implementation',
+      'Dedicated support team',
+      'Custom simulations',
+      'Executive training programs',
+      '24/7 monitoring'
+    ],
+    color: 'from-orange-600 to-red-600',
+    popular: false
+  }
+];
+
+// Case studies
+const caseStudies = [
+  {
+    title: 'Global Aviation Security',
+    client: 'International Airport Authority',
+    challenge: 'Modernize security infrastructure across 180+ facilities',
+    solution: 'Implemented Vertex Pro with custom AI modules and integrated training programs',
+    results: [
+      '99.8% threat detection accuracy',
+      '40% reduction in false alarms',
+      '$2.5M annual cost savings',
+      '100% regulatory compliance'
+    ],
+    metrics: {
+      facilities: '180+',
+      uptime: '99.9%',
+      response: '<30s'
+    },
+    industry: 'Aviation',
+    color: 'from-blue-600 to-cyan-600'
+  },
+  {
+    title: 'Smart City Communication',
+    client: 'Metropolitan City Government',
+    challenge: 'Secure communication platform for 500+ departments',
+    solution: 'Deployed Buzz World with custom workflows and executive training',
+    results: [
+      '500+ departments connected',
+      '95% user adoption rate',
+      '60% faster emergency response',
+      'Zero security incidents'
+    ],
+    metrics: {
+      users: '50K+',
+      departments: '500+',
+      messages: '1M+'
+    },
+    industry: 'Government',
+    color: 'from-green-600 to-emerald-600'
+  },
+  {
+    title: 'Financial Institution Security',
+    client: 'Major Banking Group',
+    challenge: 'Advanced threat protection and compliance management',
+    solution: 'Full YUBIX ecosystem deployment with AI integration',
+    results: [
+      '100% regulatory compliance',
+      '50% reduction in security incidents',
+      '$5M prevented fraud losses',
+      'Enhanced customer trust'
+    ],
+    metrics: {
+      branches: '1200+',
+      transactions: '50M+',
+      compliance: '100%'
+    },
+    industry: 'Financial',
+    color: 'from-purple-600 to-pink-600'
+  }
+];
+
+// Service Card Component
+const ServiceCard = ({ service, index }: { service: typeof services[0], index: number }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const { ref, isIntersecting } = useIntersectionObserver({ threshold: 0.1 });
+
   return (
-    <div className="min-h-screen">
-      <section className="bg-gradient-to-r from-purple-900 to-purple-800 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Professional Services
+    <div
+      ref={ref}
+      className={`group relative bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-100/50 overflow-hidden transition-all duration-700 ease-out ${
+        isIntersecting ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+      } ${isHovered ? 'scale-[1.02] shadow-2xl shadow-gray-900/10 z-10 border-gray-200/60' : 'scale-100 z-0 hover:shadow-xl shadow-gray-900/5'}`}
+      style={{ 
+        transitionDelay: `${index * 150}ms`,
+        minHeight: '460px'
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Modern Gradient Background */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${service.color} transition-all duration-700 ${
+        isHovered ? 'opacity-8' : 'opacity-0'
+      }`} />
+      
+      {/* Subtle Pattern Overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent)] opacity-60" />
+      
+      {/* Card Content */}
+      <div className="relative h-full flex flex-col p-8">
+        {/* Header Section */}
+        <div className="flex-shrink-0 mb-6">
+          {/* Icon & Badge Row */}
+          <div className="flex items-start justify-between mb-6">
+            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center text-white text-2xl shadow-lg transition-transform duration-500 ${
+              isHovered ? 'scale-110 rotate-3' : 'scale-100'
+            }`}>
+              {service.icon}
+            </div>
+            <div className={`px-4 py-2 rounded-full text-xs font-semibold bg-gradient-to-r ${service.color} text-white shadow-lg backdrop-blur-sm transition-all duration-500 ${
+              isHovered ? 'scale-105 shadow-xl' : 'scale-100'
+            }`}>
+              {service.duration}
+            </div>
+          </div>
+          
+          {/* Title & Subtitle */}
+          <div className="space-y-3 mb-4">
+            <h3 className="text-2xl font-bold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-gray-800">
+              {service.title}
+            </h3>
+            <p className="text-base font-medium text-gray-600 transition-colors duration-300 group-hover:text-gray-700">
+              {service.subtitle}
+            </p>
+          </div>
+          
+          {/* Description */}
+          <p className="text-gray-700 leading-relaxed text-sm transition-colors duration-300 group-hover:text-gray-800">
+            {service.description}
+          </p>
+        </div>
+
+        {/* Features - Modern Expandable Section */}
+        <div className={`transition-all duration-500 ease-out overflow-hidden ${
+          isHovered ? 'max-h-80 opacity-100 mb-6' : 'max-h-0 opacity-0 mb-0'
+        }`}>
+          <div className="border-t border-gray-200/60 pt-6 space-y-6">
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 gap-6">
+              {/* Key Features */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${service.color} shadow-sm`} />
+                  Key Features
+                </h4>
+                <div className="space-y-2">
+                  {service.features.slice(0, 3).map((feature, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-sm text-gray-700 transition-all duration-300 hover:text-gray-900">
+                      <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${service.color} mt-2 flex-shrink-0 shadow-sm`} />
+                      <span className="leading-relaxed">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Deliverables */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 shadow-sm" />
+                  Deliverables
+                </h4>
+                <div className="space-y-2">
+                  {service.deliverables.slice(0, 3).map((deliverable, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-sm text-gray-700 transition-all duration-300 hover:text-gray-900">
+                      <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 mt-2 flex-shrink-0 shadow-sm" />
+                      <span className="leading-relaxed">{deliverable}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-grow" />
+
+        {/* Footer Section */}
+        <div className="flex-shrink-0 pt-6 border-t border-gray-100/60">
+          <div className="flex items-center justify-between">
+            {/* Pricing */}
+            <div className="space-y-1">
+              <div className={`text-2xl font-bold bg-gradient-to-r ${service.color} bg-clip-text text-transparent transition-all duration-300`}>
+                {service.price}
+              </div>
+              <div className="text-xs text-gray-500 font-medium">Starting price</div>
+            </div>
+            
+            {/* CTA Button */}
+            <Link
+              href="/contact"
+              className={`group/btn relative inline-flex items-center px-6 py-3 rounded-2xl bg-gradient-to-r ${service.color} text-white font-semibold text-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 transform overflow-hidden`}
+            >
+              <span className="relative z-10 transition-transform duration-300 group-hover/btn:translate-x-0.5">
+                Get Started
+              </span>
+              <svg className="w-4 h-4 ml-2 relative z-10 transition-transform duration-300 group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              
+              {/* Button Hover Effect */}
+              <div className="absolute inset-0 bg-white/20 scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left rounded-2xl" />
+              
+              {/* Button Shine Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Package Card Component
+const PackageCard = ({ pkg }: { pkg: typeof packages[0] }) => {
+  return (
+    <div className={`relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border ${
+      pkg.popular ? 'border-violet-200 shadow-violet-100' : 'border-gray-100'
+    } ${pkg.popular ? 'mt-6' : 'mt-0'}`}>
+      {pkg.popular && (
+        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg border-2 border-white">
+            <div className="flex items-center gap-1.5">
+              <svg className="w-3 h-3 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+              <span>Most Popular</span>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className={`p-6 ${pkg.popular ? 'pt-12' : 'pt-6'}`}>
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-3">{pkg.name}</h3>
+          <div className="mb-3">
+            <span className={`text-3xl font-bold bg-gradient-to-r ${pkg.color} bg-clip-text text-transparent`}>
+              {pkg.price}
+            </span>
+            <span className="text-gray-500 text-sm ml-1">{pkg.period}</span>
+          </div>
+          <p className="text-gray-600 text-sm leading-relaxed">{pkg.description}</p>
+        </div>
+        
+        <ul className="space-y-2.5 mb-6">
+          {pkg.features.map((feature, idx) => (
+            <li key={idx} className="flex items-start text-gray-600 text-sm">
+              <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${pkg.color} flex items-center justify-center mr-3 mt-0.5 flex-shrink-0`}>
+                <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <span className="leading-relaxed">{feature}</span>
+            </li>
+          ))}
+        </ul>
+        
+        <Link
+          href="/contact"
+          className={`w-full inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-gradient-to-r ${pkg.color} text-white font-medium hover:opacity-90 transition-opacity duration-200`}
+        >
+          Choose Plan
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+// Case Study Card Component
+const CaseStudyCard = ({ study }: { study: typeof caseStudies[0] }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div 
+      className={`group relative bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-100/50 overflow-hidden transition-all duration-700 ease-out ${
+        isHovered ? 'scale-[1.02] shadow-2xl shadow-gray-900/15 z-10 border-gray-200/60' : 'scale-100 z-0 hover:shadow-xl shadow-gray-900/8'
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Modern Top Accent with Animation */}
+      <div className={`h-1 bg-gradient-to-r ${study.color} transform transition-all duration-500 ${
+        isHovered ? 'h-2' : 'h-1'
+      }`} />
+      
+      {/* Subtle Pattern Overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(120,119,198,0.05),transparent)] opacity-60" />
+      
+      <div className="relative p-8">
+        {/* Header Section */}
+        <div className="space-y-4 mb-6">
+          {/* Industry Badge */}
+          <div className="flex justify-start">
+            <div className={`px-4 py-2 rounded-2xl text-sm font-semibold bg-gradient-to-r ${study.color} text-white shadow-lg transition-all duration-500 ${
+              isHovered ? 'scale-105 shadow-xl' : 'scale-100'
+            }`}>
+              {study.industry}
+            </div>
+          </div>
+          
+          {/* Metrics Grid */}
+          <div className="flex gap-4 justify-end">
+            {Object.entries(study.metrics).map(([key, value]) => (
+              <div key={key} className="text-center group-hover:scale-105 transition-transform duration-300">
+                <div className={`text-lg font-bold bg-gradient-to-r ${study.color} bg-clip-text text-transparent transition-all duration-300`}>
+                  {value}
+                </div>
+                <div className="text-xs text-gray-500 font-medium capitalize tracking-wide">{key}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Title & Client */}
+        <div className="mb-6 space-y-3">
+          <h3 className="text-2xl font-bold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-gray-800">
+            {study.title}
+          </h3>
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${study.color} opacity-60`} />
+            <p className="text-gray-600 font-medium transition-colors duration-300 group-hover:text-gray-700">
+              {study.client}
+            </p>
+          </div>
+        </div>
+        
+        {/* Challenge & Solution Grid */}
+        <div className="space-y-6 mb-6">
+          <div className="space-y-3">
+            <h4 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-red-500 to-orange-500" />
+              Challenge
+            </h4>
+            <p className="text-gray-700 leading-relaxed text-sm bg-gray-50/50 p-4 rounded-2xl border border-gray-100/60 transition-all duration-300 group-hover:bg-gray-50/80">
+              {study.challenge}
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <h4 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${study.color}`} />
+              Solution
+            </h4>
+            <p className="text-gray-700 leading-relaxed text-sm bg-gray-50/50 p-4 rounded-2xl border border-gray-100/60 transition-all duration-300 group-hover:bg-gray-50/80">
+              {study.solution}
+            </p>
+          </div>
+        </div>
+        
+        {/* Expandable Results Section */}
+        <div className={`transition-all duration-500 ease-out overflow-hidden ${
+          isExpanded ? 'max-h-80 opacity-100 mb-6' : 'max-h-0 opacity-0 mb-0'
+        }`}>
+          <div className="border-t border-gray-200/60 pt-6">
+            <h4 className="font-semibold text-gray-900 mb-4 text-sm flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500" />
+              Key Results & Impact
+            </h4>
+            <div className="grid grid-cols-1 gap-3">
+              {study.results.map((result, idx) => (
+                <div 
+                  key={idx} 
+                  className="flex items-start gap-3 p-3 rounded-xl bg-gradient-to-r from-green-50/50 to-emerald-50/50 border border-green-100/40 transition-all duration-300 hover:from-green-50/80 hover:to-emerald-50/80"
+                  style={{ animationDelay: `${idx * 100}ms` }}
+                >
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mt-2 flex-shrink-0 shadow-sm" />
+                  <span className="text-gray-700 text-sm leading-relaxed">{result}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        {/* Modern Toggle Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`group/btn relative w-full px-6 py-4 rounded-2xl border-2 transition-all duration-500 overflow-hidden ${
+            isExpanded
+              ? `border-transparent bg-gradient-to-r ${study.color} text-white shadow-lg`
+              : `border-gray-200 text-gray-700 hover:border-gray-300 bg-white/80 hover:bg-white backdrop-blur-sm`
+          }`}
+        >
+          <span className="relative z-10 font-semibold text-sm transition-transform duration-300 group-hover/btn:translate-y-0">
+            {isExpanded ? 'Hide Results' : 'View Impact & Results'}
+          </span>
+          
+          {/* Button Icon */}
+          <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 transition-all duration-500 ${
+            isExpanded ? 'rotate-180' : 'rotate-0'
+          }`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          
+          {/* Hover Effect for Non-Expanded State */}
+          {!isExpanded && (
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-50 to-gray-100 scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left rounded-2xl" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default function ServicesPage() {
+  const { ref: heroRef, isIntersecting: heroInView } = useIntersectionObserver({ threshold: 0.2 });
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-cyan-50">
+      {/* Hero Section */}
+      <section ref={heroRef} className="relative min-h-[80vh] bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+        
+        {/* Animated Background Particles */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        </div>
+
+        {/* Decorative Grid Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+            backgroundSize: '50px 50px'
+          }}></div>
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <div className={`text-center transition-all duration-1000 ${
+            heroInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}>
+            {/* Badge */}
+            <div className="mb-12">
+              <div className="inline-flex items-center gap-4 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-cyan-600/20 backdrop-blur-xl px-10 py-5 rounded-2xl border border-white/30 shadow-2xl">
+                <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse"></div>
+                <span className="text-white/90 text-sm font-bold uppercase tracking-wider">Professional Services</span>
+                <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse delay-500"></div>
+              </div>
+            </div>
+
+            {/* Heading */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-12 leading-[1.1] tracking-tight">
+              <span className="block text-white mb-6 drop-shadow-2xl">
+                Expert
+              </span>
+              <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl pb-2">
+                Security Services
+              </span>
+              <span className="block text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mt-6 bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent pb-2">
+                Tailored Solutions for Every Need
+              </span>
             </h1>
-            <p className="text-xl md:text-2xl text-purple-100 max-w-3xl mx-auto">
-              Expert advisory, training, and operational support for comprehensive security solutions
+
+            {/* Enhanced Description */}
+            <div className="mb-8">
+              <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 max-w-5xl mx-auto leading-relaxed font-light">
+                <span className="text-blue-300 font-semibold">Strategic Advisory</span>
+                <span className="text-gray-400 mx-3">•</span>
+                <span className="text-purple-300 font-semibold">Custom Development</span>
+                <span className="text-gray-400 mx-3">•</span>
+                <span className="text-cyan-300 font-semibold">Expert Training</span>
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <Link
+                href="#services"
+                className="group relative inline-flex items-center px-10 py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg hover:shadow-2xl transform transition-all duration-500 hover:scale-105 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-2xl"></div>
+                <div className="relative flex items-center">
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">Explore Services</span>
+                  <svg className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </Link>
+
+              <Link
+                href="/contact"
+                className="group relative inline-flex items-center px-10 py-5 rounded-2xl border-2 border-white/30 text-white font-bold text-lg backdrop-blur-sm hover:bg-white/10 hover:border-white/50 transition-all duration-300"
+              >
+                <div className="relative flex items-center">
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>Schedule Consultation</span>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg className="w-full h-16 text-slate-50" fill="currentColor" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25"></path>
+            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5"></path>
+            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"></path>
+          </svg>
+        </div>
+      </section>
+
+      {/* Services Grid */}
+      <section id="services" className="py-16 bg-gradient-to-br from-slate-50 to-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium mb-6">
+              🛡️ Expert Services
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Expert Services</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Comprehensive security solutions designed to protect, enhance, and optimize your organization&apos;s digital infrastructure.
             </p>
           </div>
-        </div>
-      </section>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-            <div>
-              <div className="w-20 h-20 bg-red-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z" />
-                </svg>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 items-start">
+            {services.map((service, index) => (
+              <div key={service.id} className="flex">
+                <ServiceCard service={service} index={index} />
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                Gold Standard Operations Room
-              </h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Our premier crisis management facility provides real-time support and coordination during 
-                critical security events. The Gold Standard Operations Room serves as a central command hub 
-                where expert analysts and security professionals provide immediate assistance and strategic oversight.
-              </p>
-              
-              <div className="space-y-4 mb-6">
-                <h3 className="text-xl font-bold text-gray-900">Core Capabilities:</h3>
-                <ul className="space-y-2 text-gray-700">
-                  <li className="flex items-start">
-                    <span className="text-red-600 mr-2">•</span>
-                    24/7 secure crisis room services
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-600 mr-2">•</span>
-                    Real-time support from security experts
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-600 mr-2">•</span>
-                    Emergency coordination and response
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-red-600 mr-2">•</span>
-                    Strategic oversight interface
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-red-50 p-6 rounded-lg mb-6">
-                <h4 className="font-bold text-red-900 mb-3">Operations Room Services:</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-red-800">
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                    Crisis Response Coordination
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                    Real-time Threat Assessment
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                    Emergency Simulations
-                  </div>
-                  <div className="flex items-center">
-                    <span className="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                    Strategic Advisory Support
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gradient-to-br from-red-50 to-red-100 p-8 rounded-lg">
-              <div className="aspect-video bg-white rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                    </svg>
-                  </div>
-                  <p className="text-gray-600">Operations Room Command Center</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">24/7 Availability</h3>
-              <p className="text-gray-600 text-sm">Round-the-clock support and monitoring</p>
-            </div>
-
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Expert Team</h3>
-              <p className="text-gray-600 text-sm">Highly trained security professionals</p>
-            </div>
-
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Secure Environment</h3>
-              <p className="text-gray-600 text-sm">Highest security standards maintained</p>
-            </div>
-
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-gray-900 mb-2">Rapid Response</h3>
-              <p className="text-gray-600 text-sm">Immediate crisis intervention capabilities</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* Service Packages */}
       <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Professional Advisory Services
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Comprehensive security consulting and customized solutions tailored to your organization&apos;s needs
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
+              💰 Pricing Plans
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Service Packages & Pricing</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Choose the perfect service package that fits your organization&apos;s needs and budget.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Advanced Security Advisory</h3>
-              <p className="text-gray-600 mb-4">
-                Strategic security consulting services that help organizations develop comprehensive 
-                security frameworks tailored to their specific threats and operational requirements.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Risk Assessment & Analysis
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Security Strategy Development
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Compliance & Regulatory Guidance
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Threat Intelligence Integration
-                </li>
-              </ul>
-            </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Customized Feature Development</h3>
-              <p className="text-gray-600 mb-4">
-                Bespoke security feature development that extends our core platforms with 
-                organization-specific capabilities and integrations for unique operational requirements.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Custom Module Development
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Third-party System Integration
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Workflow Optimization
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Performance Enhancement
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Module Integration</h3>
-              <p className="text-gray-600 mb-4">
-                Advanced artificial intelligence integration services that enhance security capabilities 
-                with predictive analytics, automated threat detection, and intelligent response systems.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Predictive Threat Analytics
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Automated Response Systems
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Machine Learning Implementation
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Behavioral Pattern Recognition
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Simulations & Drills</h3>
-              <p className="text-gray-600 mb-4">
-                Comprehensive emergency preparedness through realistic security simulations and 
-                training drills that test and improve organizational response capabilities.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Crisis Scenario Simulations
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Emergency Response Drills
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Performance Assessment
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Improvement Recommendations
-                </li>
-              </ul>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {packages.map((pkg) => (
+              <PackageCard key={pkg.name} pkg={pkg} />
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Training & Development
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Professional education programs designed to enhance security awareness and operational capabilities
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Executive & Community Training</h3>
-              <p className="text-lg text-gray-600 mb-6">
-                Our comprehensive training programs are designed to enhance security awareness and 
-                operational capabilities across all organizational levels, from executive leadership 
-                to front-line personnel.
-              </p>
-              
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-white text-sm font-bold">1</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Executive Security Briefings</h4>
-                    <p className="text-gray-600 text-sm">Strategic security overview for leadership teams</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-white text-sm font-bold">2</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Operational Training Programs</h4>
-                    <p className="text-gray-600 text-sm">Hands-on training for security personnel</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-white text-sm font-bold">3</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Community Awareness Workshops</h4>
-                    <p className="text-gray-600 text-sm">Security awareness for all staff members</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center mr-4 mt-1">
-                    <span className="text-white text-sm font-bold">4</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Continuous Education Programs</h4>
-                    <p className="text-gray-600 text-sm">Ongoing security education and updates</p>
-                  </div>
-                </div>
+      {/* Case Studies */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        {/* Subtle Background Elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-32 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-3xl" />
+          <div className="absolute bottom-32 right-1/4 w-72 h-72 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full blur-3xl" />
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Redesigned Section Header */}
+          <div className="text-center mb-20">
+            {/* Clean Status Badge */}
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/50 mb-8">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-emerald-700 font-semibold text-sm">Live Results</span>
+              </div>
+              <div className="w-px h-4 bg-emerald-300" />
+              <span className="text-emerald-600 text-sm font-medium">Updated Real-Time</span>
+            </div>
+            
+            {/* Modern Heading */}
+            <div className="space-y-4 mb-8">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                Real Impact,
+              </h2>
+              <div className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                Proven Results
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-8 rounded-lg">
-              <div className="bg-white p-6 rounded-lg">
-                <h4 className="text-lg font-bold text-gray-900 mb-4">Training Outcomes</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Security Awareness</span>
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div className="bg-blue-600 h-2 rounded-full w-5/6"></div>
-                    </div>
+            <p className="text-lg md:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12">
+              Discover how our expert security services have transformed operations and delivered measurable value 
+              for organizations across industries worldwide.
+            </p>
+            
+            {/* Redesigned Metrics Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              <div className="group relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    100<span className="text-blue-600">+</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Response Capability</span>
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-600 h-2 rounded-full w-4/5"></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Threat Recognition</span>
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div className="bg-purple-600 h-2 rounded-full w-11/12"></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700">Crisis Management</span>
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div className="bg-red-600 h-2 rounded-full w-3/4"></div>
-                    </div>
+                  <div className="text-sm text-gray-600 font-medium">Projects Delivered</div>
+                  <div className="mt-2 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse" style={{ width: '95%' }} />
                   </div>
                 </div>
+              </div>
+              
+              <div className="group relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    98<span className="text-green-600">%</span>
+                  </div>
+                  <div className="text-sm text-gray-600 font-medium">Success Rate</div>
+                  <div className="mt-2 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse" style={{ width: '98%' }} />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="group relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    $50<span className="text-purple-600">M+</span>
+                  </div>
+                  <div className="text-sm text-gray-600 font-medium">Risk Prevented</div>
+                  <div className="mt-2 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse" style={{ width: '87%' }} />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="group relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="relative">
+                  <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    24<span className="text-orange-600">/7</span>
+                  </div>
+                  <div className="text-sm text-gray-600 font-medium">Support Coverage</div>
+                  <div className="mt-2 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-orange-500 to-red-500 rounded-full animate-pulse" style={{ width: '100%' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Case Studies Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+            {caseStudies.map((study, index) => (
+              <div key={study.title} className="flex" style={{ animationDelay: `${index * 200}ms` }}>
+                <CaseStudyCard study={study} />
+              </div>
+            ))}
+          </div>
+          
+          {/* Modern Bottom CTA */}
+          <div className="text-center mt-20">
+            <div className="inline-flex flex-col sm:flex-row gap-4 items-center">
+              <Link
+                href="/contact"
+                className="group relative inline-flex items-center px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform overflow-hidden"
+              >
+                <span className="relative z-10">Start Your Success Story</span>
+                <svg className="w-5 h-5 ml-3 relative z-10 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Link>
+              
+              <div className="text-sm text-gray-500">
+                <span className="font-medium">Free consultation</span> • No commitment required
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-blue-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Enhance Your Security Operations?
+      {/* CTA Section */}
+      <section className="relative py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-72 h-72 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6 border border-white/30">
+            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+            Ready to Get Started?
+          </div>
+
+          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            Let&apos;s Build Your
+            <span className="block bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
+              Security Future
+            </span>
           </h2>
-          <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
-            Contact our expert team to discuss how our professional services can strengthen 
-            your organization&apos;s security posture and operational resilience.
+
+          <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto">
+            Our team of security experts is ready to assess your needs and design the perfect solution.
+            Schedule a free consultation to get started.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a 
-              href="/contact" 
-              className="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link
+              href="/contact"
+              className="group relative inline-flex items-center px-10 py-5 rounded-2xl bg-white text-blue-600 font-bold text-lg hover:shadow-2xl transform transition-all duration-500 hover:scale-105"
             >
-              Schedule Consultation
-            </a>
-            <a 
-              href="/products" 
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-900 transition-colors"
+              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Schedule Free Consultation
+            </Link>
+
+            <Link
+              href="/ecosystem"
+              className="group relative inline-flex items-center px-10 py-5 rounded-2xl border-2 border-white/30 text-white font-bold text-lg backdrop-blur-sm hover:bg-white/10"
             >
-              Explore Our Platforms
-            </a>
+              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              View Platform Ecosystem
+            </Link>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }
