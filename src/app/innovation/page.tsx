@@ -1,386 +1,605 @@
-export default function Innovation() {
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import CallToActionSection from '@/components/CallToActionSection'
+
+export default function InnovationPage() {
+  const [visibleSections, setVisibleSections] = useState<number[]>([])
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Add custom CSS for animations
+    const style = document.createElement('style')
+    style.textContent = `
+      @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-15px) rotate(2deg); }
+        66% { transform: translateY(-8px) rotate(-1deg); }
+      }
+      
+      @keyframes gradient-x {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+      
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+      }
+      
+      .animate-float {
+        animation: float 8s ease-in-out infinite;
+      }
+      
+      .animate-gradient-x {
+        background-size: 200% 200%;
+        animation: gradient-x 4s ease infinite;
+      }
+      
+      .animate-pulse-glow {
+        animation: pulse-glow 3s ease-in-out infinite;
+      }
+      
+      .bg-circuit-pattern {
+        background-image: 
+          radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+      }
+    `
+    document.head.appendChild(style)
+    
+    return () => {
+      document.head.removeChild(style)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Intersection Observer for section animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute('data-section-item') || '0')
+            setVisibleSections(prev => [...prev, index])
+          }
+        })
+      },
+      { threshold: 0.3, rootMargin: '0px 0px -100px 0px' }
+    )
+
+    // Observe section items after component mounts
+    setTimeout(() => {
+      const sectionItems = document.querySelectorAll('[data-section-item]')
+      sectionItems.forEach(item => observer.observe(item))
+    }, 100)
+
+    return () => observer.disconnect()
+  }, [])
+
+  const innovationSections = [
+    {
+      id: 'ai-research',
+      title: 'AI Research',
+      subtitle: 'Pioneering Intelligent Security',
+      description: 'Cutting-edge artificial intelligence research focused on revolutionizing security through machine learning and neural networks.',
+      icon: '🧠',
+      gradient: 'from-blue-600 via-purple-600 to-indigo-600',
+      bgGradient: 'from-blue-50/80 via-purple-50/60 to-indigo-50/40',
+      glowColor: 'bg-blue-500/20',
+      borderColor: 'border-blue-200/50',
+      features: [
+        'Machine Learning Threat Detection',
+        'Neural Network Pattern Recognition',
+        'Predictive Security Analytics',
+        'Behavioral Analysis AI',
+        'Computer Vision Security',
+        'Natural Language Processing'
+      ],
+      stats: { projects: '25+', accuracy: '99.7%', models: '50+' }
+    },
+    {
+      id: 'emerging-threats',
+      title: 'Emerging Threats',
+      subtitle: 'Future-Proofing Security',
+      description: 'Advanced research into tomorrow\'s security challenges, developing countermeasures before threats become reality.',
+      icon: '🔮',
+      gradient: 'from-red-600 via-orange-600 to-yellow-500',
+      bgGradient: 'from-red-50/80 via-orange-50/60 to-yellow-50/40',
+      glowColor: 'bg-red-500/20',
+      borderColor: 'border-red-200/50',
+      features: [
+        'Quantum Computing Threats',
+        'IoT Security Vulnerabilities',
+        'Deep Fake Detection',
+        'Social Engineering Analysis',
+        'Cyber-Physical Attack Prevention',
+        'Zero-Day Exploit Research'
+      ],
+      stats: { threats: '500+', prediction: '95%', response: '< 1hr' }
+    },
+    {
+      id: 'future-tech',
+      title: 'Future Technologies',
+      subtitle: 'Tomorrow\'s Security Today',
+      description: 'Experimental technologies that will define the next generation of security solutions.',
+      icon: '🚀',
+      gradient: 'from-cyan-600 via-teal-600 to-green-600',
+      bgGradient: 'from-cyan-50/80 via-teal-50/60 to-green-50/40',
+      glowColor: 'bg-cyan-500/20',
+      borderColor: 'border-cyan-200/50',
+      features: [
+        'Quantum Encryption Technology',
+        'Holographic Security Interfaces',
+        'Biometric Evolution Systems',
+        'Edge AI Computing',
+        'Autonomous Security Drones',
+        'Blockchain Security Networks'
+      ],
+      stats: { prototypes: '30+', patents: '15', timeline: '2-5 years' }
+    },
+    {
+      id: 'research-papers',
+      title: 'Research Papers',
+      subtitle: 'Knowledge Sharing',
+      description: 'Published research contributing to the global security community and advancing industry standards.',
+      icon: '📚',
+      gradient: 'from-violet-600 via-purple-600 to-pink-600',
+      bgGradient: 'from-violet-50/80 via-purple-50/60 to-pink-50/40',
+      glowColor: 'bg-violet-500/20',
+      borderColor: 'border-violet-200/50',
+      features: [
+        'Peer-Reviewed Publications',
+        'Conference Presentations',
+        'White Paper Publications',
+        'Technical Documentation',
+        'Industry Best Practices',
+        'Open Source Contributions'
+      ],
+      stats: { papers: '150+', citations: '2000+', conferences: '25+' }
+    },
+    {
+      id: 'beta-programs',
+      title: 'Beta Programs',
+      subtitle: 'Early Access Innovation',
+      description: 'Exclusive programs for testing cutting-edge security features before they reach the market.',
+      icon: '⚡',
+      gradient: 'from-emerald-600 via-green-600 to-teal-600',
+      bgGradient: 'from-emerald-50/80 via-green-50/60 to-teal-50/40',
+      glowColor: 'bg-emerald-500/20',
+      borderColor: 'border-emerald-200/50',
+      features: [
+        'Early Feature Access',
+        'Direct Developer Feedback',
+        'Priority Support Channels',
+        'Exclusive Training Sessions',
+        'Beta Community Network',
+        'Performance Analytics'
+      ],
+      stats: { users: '5K+', features: '100+', feedback: '4.9/5' }
+    },
+    {
+      id: 'proof-of-concepts',
+      title: 'Proof of Concepts',
+      subtitle: 'Validating Innovation',
+      description: 'Rapid prototyping and validation of revolutionary security concepts through practical demonstrations.',
+      icon: '🔬',
+      gradient: 'from-indigo-600 via-blue-600 to-cyan-600',
+      bgGradient: 'from-indigo-50/80 via-blue-50/60 to-cyan-50/40',
+      glowColor: 'bg-indigo-500/20',
+      borderColor: 'border-indigo-200/50',
+      features: [
+        'Rapid Prototyping',
+        'Concept Validation',
+        'Technical Feasibility',
+        'Market Research',
+        'Performance Testing',
+        'Scalability Analysis'
+      ],
+      stats: { concepts: '75+', success: '85%', timeline: '2-12 weeks' }
+    },
+    {
+      id: 'innovation-partners',
+      title: 'Innovation Partners',
+      subtitle: 'Collaborative Excellence',
+      description: 'Strategic partnerships with leading institutions and organizations to accelerate security innovation.',
+      icon: '🤝',
+      gradient: 'from-pink-600 via-rose-600 to-red-600',
+      bgGradient: 'from-pink-50/80 via-rose-50/60 to-red-50/40',
+      glowColor: 'bg-pink-500/20',
+      borderColor: 'border-pink-200/50',
+      features: [
+        'University Collaborations',
+        'Industry Partnerships',
+        'Government Relations',
+        'Startup Incubation',
+        'Joint Research Projects',
+        'Technology Transfer'
+      ],
+      stats: { partners: '50+', projects: '200+', countries: '15+' }
+    },
+    {
+      id: 'developer-apis',
+      title: 'Developer APIs',
+      subtitle: 'Building the Future',
+      description: 'Comprehensive APIs and development tools for creating next-generation security applications.',
+      icon: '💻',
+      gradient: 'from-slate-600 via-gray-600 to-zinc-600',
+      bgGradient: 'from-slate-50/80 via-gray-50/60 to-zinc-50/40',
+      glowColor: 'bg-slate-500/20',
+      borderColor: 'border-slate-200/50',
+      features: [
+        'RESTful API Architecture',
+        'SDK Development Kits',
+        'GraphQL Endpoints',
+        'Real-time WebSockets',
+        'Comprehensive Documentation',
+        'Developer Support Portal'
+      ],
+      stats: { endpoints: '500+', developers: '10K+', uptime: '99.99%' }
+    }
+  ]
+
   return (
-    <div className="min-h-screen">
-      <section className="bg-gradient-to-r from-indigo-900 to-purple-800 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Innovation & AI Lab
-            </h1>
-            <p className="text-xl md:text-2xl text-indigo-100 max-w-3xl mx-auto">
-              Human First. AI Enhanced. Pioneering the future of intelligent security solutions.
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
+      {/* Hero Section */}
+      <section className="relative py-24 bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 overflow-hidden">
+        {/* Advanced Background Effects */}
+        <div className="absolute inset-0">
+          {/* Animated gradient orbs */}
+          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-500/15 to-pink-500/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          
+          {/* Circuit pattern overlay */}
+          <div className="absolute inset-0 bg-circuit-pattern"></div>
+          
+          {/* Floating tech elements with improved distribution */}
+          <div className="absolute inset-0 overflow-hidden">
+            {Array.from({ length: 25 }).map((_, i) => {
+              const seed = i * 137.5;
+              const left = ((seed * 9.3) % 100);
+              const top = ((seed * 7.7) % 100);
+              const delay = ((seed * 0.05) % 5);
+              const duration = 4 + ((seed * 0.06) % 6);
+              
+              return (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-blue-300/30 rounded-full animate-float"
+                  style={{
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    animationDelay: `${delay}s`,
+                    animationDuration: `${duration}s`
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
-      </section>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Our Philosophy
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
-              At YUBIX, we believe that the most effective security solutions emerge when human expertise 
-              is enhanced by artificial intelligence, not replaced by it.
-            </p>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Floating badge with glassmorphism */}
+          <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-8 py-3 mb-8 group hover:bg-white/15 hover:scale-105 transition-all duration-500 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-3 h-3 bg-blue-400 rounded-full animate-ping opacity-75"></div>
+              </div>
+              <span className="font-bold text-sm uppercase tracking-wider bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Innovation Lab</span>
+            </div>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-8 leading-tight">
+            Future of
+            <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x">
+              Security Innovation
+            </span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-white/80 mb-16 max-w-4xl mx-auto leading-relaxed font-light">
+            Pioneering next-generation security solutions through cutting-edge research, AI innovation, and collaborative development.
+          </p>
+
+          {/* Enhanced Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-12">
+            {[
+              { value: '25+', label: 'AI Projects', icon: '🧠' },
+              { value: '150+', label: 'Research Papers', icon: '📚' },
+              { value: '5K+', label: 'Beta Users', icon: '⚡' },
+              { value: '50+', label: 'Partners', icon: '🤝' }
+            ].map((stat, index) => (
+              <div
+                key={stat.label}
+                className="group bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:scale-105 transition-all duration-500 shadow-xl animate-pulse-glow"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
+                <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
+                <div className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">{stat.value}</div>
+                <div className="text-white/70 text-sm uppercase tracking-wider font-medium">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="#ai-research"
+              className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 font-semibold text-lg overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"></div>
+              <span className="relative z-10">Explore Research</span>
+              <svg className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </Link>
             
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 rounded-lg">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Human-Centered</h3>
-                  <p className="text-gray-600">Technology designed around human needs and intuition</p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">AI-Enhanced</h3>
-                  <p className="text-gray-600">Artificial intelligence amplifying human capabilities</p>
-                </div>
-
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Real-Time Action</h3>
-                  <p className="text-gray-600">Immediate response and prevention capabilities</p>
-                </div>
-              </div>
-            </div>
+            <Link
+              href="/contact"
+              className="group inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/30 text-white px-8 py-4 rounded-2xl hover:bg-white/20 hover:scale-105 transition-all duration-500 font-semibold"
+            >
+              <span>Join Innovation</span>
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Custom AI Modules
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Our specialized AI modules are designed to enhance security operations across all platforms
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Threat Correlation</h3>
-              <p className="text-gray-600 mb-4">
-                Advanced machine learning algorithms that identify patterns and correlations across 
-                multiple threat sources, providing comprehensive situational awareness and predictive insights.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Multi-source data analysis
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Pattern recognition algorithms
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Risk correlation mapping
-                </li>
-                <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">•</span>
-                  Predictive threat modeling
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.828 9l8.586-8.586a2 2 0 012.828 0l4.242 4.242a2 2 0 010 2.828L12.656 15.656a2 2 0 01-2.828 0L5.586 11.414a2 2 0 010-2.828L4.828 9z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Predictive Alerts</h3>
-              <p className="text-gray-600 mb-4">
-                Intelligent alert systems that anticipate potential security incidents before they occur, 
-                enabling proactive response and prevention strategies.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Early warning systems
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Behavioral anomaly detection
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Risk escalation prediction
-                </li>
-                <li className="flex items-start">
-                  <span className="text-green-600 mr-2">•</span>
-                  Automated response triggers
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Voice-AI</h3>
-              <p className="text-gray-600 mb-4">
-                Advanced voice recognition and natural language processing capabilities that enable 
-                hands-free operation and intelligent voice-based security interactions.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Voice command recognition
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Natural language processing
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Stress pattern analysis
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  Emergency voice activation
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="w-16 h-16 bg-red-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Visual-AI</h3>
-              <p className="text-gray-600 mb-4">
-                Sophisticated computer vision systems that provide real-time visual analysis, 
-                object recognition, and behavioral pattern detection for comprehensive surveillance.
-              </p>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Real-time video analysis
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Object and person recognition
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Behavioral analysis
-                </li>
-                <li className="flex items-start">
-                  <span className="text-red-600 mr-2">•</span>
-                  Anomaly detection
-                </li>
-              </ul>
-            </div>
+      {/* Innovation Sections */}
+      {innovationSections.map((section, index) => (
+        <section
+          key={section.id}
+          id={section.id}
+          className={`relative py-24 bg-gradient-to-br ${section.bgGradient} overflow-hidden`}
+          data-section-item={index}
+          onMouseEnter={() => setActiveSection(section.id)}
+          onMouseLeave={() => setActiveSection(null)}
+        >
+          {/* Dynamic background effects */}
+          <div className="absolute inset-0">
+            <div className={`absolute top-1/4 left-1/4 w-64 h-64 ${section.glowColor} rounded-full blur-3xl opacity-60 transition-all duration-1000 ${activeSection === section.id ? 'scale-150 opacity-80' : 'scale-100'}`}></div>
+            <div className={`absolute bottom-1/4 right-1/4 w-80 h-80 ${section.glowColor} rounded-full blur-3xl opacity-40 transition-all duration-1000 ${activeSection === section.id ? 'scale-125 opacity-60' : 'scale-100'}`}></div>
+            
+            {/* Floating elements */}
+            {activeSection === section.id && (
+              <>
+                {Array.from({ length: 12 }).map((_, i) => {
+                  // Use deterministic values based on index and section to avoid hydration mismatch
+                  const seed = (i + section.id.length) * 123.4;
+                  const left = 20 + ((seed * 0.6) % 60);
+                  const top = 20 + ((seed * 0.7) % 60);
+                  const delay = (seed * 0.03) % 3;
+                  const duration = 3 + ((seed * 0.02) % 2);
+                  
+                  return (
+                    <div
+                      key={i}
+                      className={`absolute w-2 h-2 ${section.glowColor} rounded-full animate-float opacity-60`}
+                      style={{
+                        left: `${left}%`,
+                        top: `${top}%`,
+                        animationDelay: `${delay}s`,
+                        animationDuration: `${duration}s`
+                      }}
+                    />
+                  );
+                })}
+              </>
+            )}
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="w-16 h-16 bg-orange-600 rounded-lg flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                  </svg>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className={`transform transition-all duration-1000 ${
+              visibleSections.includes(index) 
+                ? 'translate-y-0 opacity-100' 
+                : 'translate-y-16 opacity-0'
+            }`}>
+              {/* Modern Section Header */}
+              <div className="text-center mb-20">
+                <div className="inline-flex items-center gap-4 mb-8 group">
+                  <div className={`relative p-4 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 group-hover:scale-110 transition-all duration-500`}>
+                    <span className="text-5xl">{section.icon}</span>
+                    <div className={`absolute inset-0 ${section.glowColor} rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 bg-gradient-to-r ${section.gradient} rounded-full animate-pulse`}></div>
+                    <span className="text-slate-700 font-bold text-sm uppercase tracking-wider">{section.title}</span>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Satellite Risk Index</h3>
-                <p className="text-gray-600 mb-4">
-                  Cutting-edge satellite imagery analysis combined with geospatial intelligence 
-                  to create comprehensive risk assessments for any location worldwide.
+                
+                <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+                  <span className={`bg-gradient-to-r ${section.gradient} bg-clip-text text-transparent`}>
+                    {section.subtitle}
+                  </span>
+                </h2>
+                
+                <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-light">
+                  {section.description}
                 </p>
-                <ul className="space-y-2 text-gray-700">
-                  <li className="flex items-start">
-                    <span className="text-orange-600 mr-2">•</span>
-                    Global satellite imagery analysis
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-orange-600 mr-2">•</span>
-                    Geospatial risk mapping
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-orange-600 mr-2">•</span>
-                    Environmental threat assessment
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-orange-600 mr-2">•</span>
-                    Real-time location intelligence
-                  </li>
-                </ul>
               </div>
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-lg">
-                <div className="aspect-video bg-white rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+
+              {/* Enhanced Content Grid */}
+              <div className="grid lg:grid-cols-2 gap-16 items-stretch">
+                {/* Features with modern cards */}
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 mb-10">
+                    <div className={`w-1 h-12 bg-gradient-to-b ${section.gradient} rounded-full`}></div>
+                    <h3 className="text-3xl font-bold text-slate-900">Key Research Areas</h3>
+                  </div>
+                  
+                  <div className="grid gap-4">
+                    {section.features.map((feature, featureIndex) => (
+                      <div
+                        key={feature}
+                        className={`group relative flex items-center gap-4 p-6 bg-white/60 backdrop-blur-md rounded-2xl border ${section.borderColor} shadow-lg hover:shadow-2xl hover:bg-white/80 transition-all duration-500 transform hover:-translate-y-1 ${
+                          visibleSections.includes(index) 
+                            ? 'translate-x-0 opacity-100' 
+                            : 'translate-x-8 opacity-0'
+                        }`}
+                        style={{ transitionDelay: `${featureIndex * 150}ms` }}
+                      >
+                        {/* Hover glow effect */}
+                        <div className={`absolute inset-0 ${section.glowColor} rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`}></div>
+                        
+                        <div className={`relative w-4 h-4 bg-gradient-to-r ${section.gradient} rounded-full flex-shrink-0 group-hover:scale-125 transition-transform duration-300`}></div>
+                        <span className="relative text-slate-700 font-medium text-lg group-hover:text-slate-900 transition-colors duration-300">{feature}</span>
+                        
+                        {/* Animated arrow */}
+                        <svg className="relative w-5 h-5 text-slate-400 ml-auto opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Enhanced CTA Button */}
+                  <div className="pt-8">
+                    <Link
+                      href="/contact"
+                      className={`group relative inline-flex items-center gap-3 bg-gradient-to-r ${section.gradient} text-white px-10 py-5 rounded-2xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 font-semibold text-lg overflow-hidden`}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left"></div>
+                      <span className="relative z-10">Join {section.title}</span>
+                      <svg className="relative z-10 w-6 h-6 group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Modern Stats & Info Card */}
+                <div className="relative">
+                  <div className={`sticky top-8 bg-white/70 backdrop-blur-md rounded-3xl p-10 shadow-2xl border ${section.borderColor} hover:bg-white/80 transition-all duration-500 group`}>
+                    {/* Card glow effect */}
+                    <div className={`absolute inset-0 ${section.glowColor} rounded-3xl blur-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
+                    
+                    <div className="relative text-center mb-10">
+                      <div className={`inline-flex p-6 bg-gradient-to-r ${section.gradient} rounded-3xl mb-6 group-hover:scale-110 transition-transform duration-500 shadow-xl`}>
+                        <span className="text-6xl text-white drop-shadow-lg">{section.icon}</span>
+                      </div>
+                      <h4 className="text-3xl font-bold text-slate-900 mb-3">{section.title}</h4>
+                      <p className="text-slate-600 font-medium">Cutting-Edge Innovation</p>
                     </div>
-                    <p className="text-gray-600">Global Risk Assessment Map</p>
+
+                    {/* Enhanced Stats Grid */}
+                    <div className="grid gap-6 mb-10">
+                      {Object.entries(section.stats).map(([key, value]) => (
+                        <div key={key} className={`text-center p-6 bg-gradient-to-br from-white to-gray-50 rounded-2xl border ${section.borderColor} shadow-lg hover:shadow-xl transition-all duration-300 group/stat`}>
+                          <div className={`text-3xl font-bold mb-3 bg-gradient-to-r ${section.gradient} bg-clip-text text-transparent group-hover/stat:scale-110 transition-transform duration-300`}>
+                            {value}
+                          </div>
+                          <div className="text-slate-600 text-sm uppercase tracking-wider font-semibold">
+                            {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Contact Section */}
+                    <div className="pt-6 border-t border-gray-200">
+                      <div className="text-center">
+                        <p className="text-slate-600 text-sm mb-6 font-medium">Interested in {section.title.toLowerCase()}?</p>
+                        <Link
+                          href="/contact"
+                          className={`group/link inline-flex items-center gap-2 bg-gradient-to-r ${section.gradient} bg-clip-text text-transparent hover:shadow-lg font-semibold text-lg transition-all duration-300 border-b-2 border-transparent hover:border-current pb-1`}
+                        >
+                          <span>Get Involved</span>
+                          <svg className="w-5 h-5 group-hover/link:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </Link>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ))}
 
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Platform Integration
+      {/* Innovation Philosophy Section */}
+      <section className="relative py-24 bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-950 overflow-hidden">
+        {/* Advanced background effects */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-r from-purple-500/15 to-pink-500/15 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-gradient-to-r from-cyan-500/10 to-indigo-500/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse" style={{ animationDelay: '4s' }}></div>
+          
+          {/* Circuit pattern overlay */}
+          <div className="absolute inset-0 bg-circuit-pattern"></div>
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-8 py-3 mb-8 group hover:bg-white/15 hover:scale-105 transition-all duration-500">
+              <div className="relative">
+                <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-75"></div>
+              </div>
+              <span className="font-bold text-sm uppercase tracking-wider bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">Our Philosophy</span>
+            </div>
+            
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight">
+              Human-Centered
+              <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-x">
+                Innovation
+              </span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Our AI modules seamlessly integrate across all YUBIX platforms to provide enhanced capabilities
+            
+            <p className="text-xl text-white/80 max-w-4xl mx-auto font-light leading-relaxed">
+              We believe the future of security lies not in replacing human expertise, but in amplifying it through intelligent technology.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg">
-              <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Vertex Pro AI</h3>
-              <p className="text-gray-600 mb-4">
-                Enterprise-level AI integration providing advanced threat correlation and predictive analytics 
-                for professional security operations.
-              </p>
-              <ul className="space-y-2 text-gray-700 text-sm">
-                <li>• Advanced threat correlation</li>
-                <li>• Predictive risk assessment</li>
-                <li>• Automated incident response</li>
-                <li>• Strategic intelligence analysis</li>
-              </ul>
-            </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg">
-              <div className="w-16 h-16 bg-green-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                </svg>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'Human-First Design',
+                description: 'Technology that enhances human capabilities rather than replacing them, ensuring intuitive and accessible security solutions.',
+                icon: '👥',
+                gradient: 'from-blue-500 to-cyan-500'
+              },
+              {
+                title: 'Ethical AI Development',
+                description: 'Responsible AI development with transparency, fairness, and privacy at the core of every innovation.',
+                icon: '⚖️',
+                gradient: 'from-green-500 to-teal-500'
+              },
+              {
+                title: 'Open Collaboration',
+                description: 'Sharing knowledge and collaborating with the global community to advance security for everyone.',
+                icon: '🌐',
+                gradient: 'from-purple-500 to-pink-500'
+              }
+            ].map((item, index) => (
+              <div
+                key={item.title}
+                className="group relative bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 hover:bg-white/15 hover:scale-105 transition-all duration-500 overflow-hidden"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {/* Card glow effect */}
+                <div className={`absolute inset-0 bg-gradient-to-r ${item.gradient} opacity-0 group-hover:opacity-10 rounded-3xl transition-opacity duration-500`}></div>
+                
+                {/* Icon with gradient background */}
+                <div className={`relative inline-flex p-4 bg-gradient-to-r ${item.gradient} rounded-2xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl`}>
+                  <span className="text-4xl text-white drop-shadow-lg">{item.icon}</span>
+                </div>
+                
+                <h3 className="relative text-2xl font-bold text-white mb-4 group-hover:text-blue-100 transition-colors duration-300">{item.title}</h3>
+                <p className="relative text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">{item.description}</p>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">Buzz World AI</h3>
-              <p className="text-gray-600 mb-4">
-                Smart social network intelligence that enhances community communication with 
-                AI-powered content filtering and threat detection.
-              </p>
-              <ul className="space-y-2 text-gray-700 text-sm">
-                <li>• Intelligent content filtering</li>
-                <li>• Automated threat detection</li>
-                <li>• Natural language processing</li>
-                <li>• Community sentiment analysis</li>
-              </ul>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg">
-              <div className="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">BYONN AI</h3>
-              <p className="text-gray-600 mb-4">
-                Accessible AI features that make advanced security intelligence available to 
-                everyone through simplified interfaces and automated assistance.
-              </p>
-              <ul className="space-y-2 text-gray-700 text-sm">
-                <li>• Simplified AI assistance</li>
-                <li>• Personal threat assessment</li>
-                <li>• Voice-activated emergency</li>
-                <li>• Predictive safety alerts</li>
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-indigo-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Research & Development
-            </h2>
-            <p className="text-xl text-indigo-100 max-w-3xl mx-auto">
-              Continuously pushing the boundaries of what&apos;s possible in AI-enhanced security
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-indigo-900">R&D</span>
-              </div>
-              <h3 className="text-lg font-bold mb-2">Active Research</h3>
-              <p className="text-indigo-100 text-sm">
-                Ongoing research projects exploring next-generation security AI technologies
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-indigo-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold mb-2">Innovation Partnerships</h3>
-              <p className="text-indigo-100 text-sm">
-                Collaborative projects with leading technology institutions and research centers
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-indigo-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold mb-2">Emerging Technologies</h3>
-              <p className="text-indigo-100 text-sm">
-                Exploration of quantum computing, edge AI, and advanced neural networks
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-indigo-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-bold mb-2">Global Impact</h3>
-              <p className="text-indigo-100 text-sm">
-                Developing solutions that address global security challenges and humanitarian needs
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Call to Action */}
+      <CallToActionSection />
     </div>
   )
 }

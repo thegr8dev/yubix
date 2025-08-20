@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import CallToActionSection from '@/components/CallToActionSection'
 
 // Counter Animation Hook
 const useCounterAnimation = (end: number, duration: number = 2000) => {
@@ -223,10 +224,10 @@ export default function About() {
           <div className="absolute top-1/3 left-1/4 w-24 h-24 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full animate-bounce" style={{animationDuration: '3s'}}></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-0 lg:px-2 py-8 sm:py-12">
           <div className={`text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             {/* Enhanced Mission Badge */}
-            <div className="mb-10">
+            <div className="mb-8">
               <div className="inline-flex items-center gap-4 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-cyan-600/20 backdrop-blur-xl px-10 py-5 rounded-2xl border border-white/30 shadow-2xl hover:border-white/40 transition-all duration-300 group">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse"></div>
@@ -241,8 +242,8 @@ export default function About() {
             </div>
 
             {/* Enhanced Heading with More Sophisticated Typography */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-10 leading-[1.1] tracking-tight">
-              <span className="block text-white mb-6 drop-shadow-2xl relative">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+              <span className="block text-white mb-3 drop-shadow-2xl relative">
                 Empowering Safer
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-70"></div>
               </span>
@@ -267,7 +268,7 @@ export default function About() {
             </div>
 
             {/* Enhanced Subtitle */}
-            <div className="max-w-5xl mx-auto mb-14">
+            <div className="max-w-5xl mx-auto mb-8">
               <p className="text-lg sm:text-xl text-white/85 leading-relaxed font-light mb-6">
                 Founded on <span className="font-bold text-cyan-300">30+ years</span> of elite security expertise, YUBIX humanizes technology to create 
                 intelligent security ecosystems that prevent threats in real-time while building resilient communities.
@@ -291,7 +292,7 @@ export default function About() {
             </div>
 
             {/* Enhanced Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto mb-5">
               {stats.map((stat, index) => {
                 const counter = counters[index]
                 return (
@@ -325,7 +326,7 @@ export default function About() {
             </div>
 
             {/* Call-to-Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mt-14 mb-8">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
               <Link
                 href="#mission"
                 className="group relative inline-flex items-center px-10 py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg hover:shadow-2xl transform transition-all duration-500 hover:scale-105 overflow-hidden"
@@ -366,7 +367,7 @@ export default function About() {
       </section>
 
       {/* Mission, Vision & Values - Modern Design */}
-      <section className="py-12 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <section id="mission" className="py-12 bg-gradient-to-br from-slate-50 via-white to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 px-6 py-3 rounded-full mb-6 backdrop-blur-sm border border-blue-200/50">
@@ -899,7 +900,7 @@ export default function About() {
       </section>
 
       {/* Leadership Team */}
-      <section className="py-12 bg-white">
+      <section id="leadership" className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600/10 to-blue-600/10 px-6 py-3 rounded-full mb-6 backdrop-blur-sm border border-purple-200/50">
@@ -948,7 +949,7 @@ export default function About() {
       </section>
 
       {/* Company Timeline */}
-      <section className="py-12 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 relative overflow-hidden">
+      <section id="timeline" className="py-12 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 relative overflow-hidden">
         {/* Enhanced Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -1049,7 +1050,7 @@ export default function About() {
       </section>
 
       {/* ISO Certification & Global Footprint */}
-      <section className="py-12 bg-gradient-to-br from-white via-blue-50 to-slate-50">
+      <section id="certifications" className="py-12 bg-gradient-to-br from-white via-blue-50 to-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* ISO Certification */}
@@ -1146,188 +1147,21 @@ export default function About() {
         </div>
       </section>
 
-      {/* Enhanced Call to Action - Modern Design */}
-      <section className="relative py-20 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 overflow-hidden">
-        {/* Enhanced Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30"></div>
-        
-        {/* Animated Background Particles */}
-        <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-        </div>
 
-        {/* Decorative Grid Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
-          }}></div>
-        </div>
-
-        {/* Floating Geometric Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 right-20 w-32 h-32 border border-white/10 rounded-full animate-spin" style={{animationDuration: '15s'}}></div>
-          <div className="absolute bottom-20 left-20 w-24 h-24 border-2 border-white/20 rotate-45"></div>
-          <div className="absolute top-1/3 right-1/4 w-16 h-16 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-full animate-bounce" style={{animationDuration: '4s'}}></div>
-        </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            {/* Enhanced Badge */}
-            <div className="mb-12">
-              <div className="inline-flex items-center gap-4 bg-gradient-to-r from-cyan-600/20 via-blue-600/20 to-purple-600/20 backdrop-blur-xl px-12 py-6 rounded-2xl border border-white/30 shadow-2xl hover:border-white/40 transition-all duration-300 group">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse delay-300"></div>
-                </div>
-                <span className="text-white/90 text-lg font-bold uppercase tracking-wider group-hover:text-white transition-colors">Ready to Get Started?</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse delay-700"></div>
-                  <div className="w-3 h-3 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full animate-pulse delay-1000"></div>
-                </div>
-              </div>
-            </div>
-
-            {/* Enhanced Heading */}
-            <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-12 leading-[0.9] tracking-tight">
-              <span className="block text-white mb-6 drop-shadow-2xl relative">
-                Transform Your
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full opacity-70"></div>
-              </span>
-              <span className="block bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl relative">
-                Security Today
-                <div className="absolute -top-4 -right-4 w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full animate-pulse"></div>
-              </span>
-            </h2>
-
-            {/* Enhanced Subtitle with Stats */}
-            <div className="max-w-6xl mx-auto mb-16">
-              <p className="text-2xl sm:text-3xl lg:text-4xl text-white/85 leading-relaxed font-light mb-8">
-                Join <span className="font-bold text-cyan-300">180+</span> organizations worldwide who trust YUBIX to protect 
-                their critical assets and build resilient communities.
-              </p>
-              
-              {/* Trust Indicators with Enhanced Design */}
-              <div className="flex flex-wrap justify-center gap-8 text-base text-white/70 mb-12">
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="font-semibold">30+ Years Expertise</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20">
-                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse delay-300"></div>
-                  <span className="font-semibold">ISO 27001 Certified</span>
-                </div>
-                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full border border-white/20">
-                  <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse delay-600"></div>
-                  <span className="font-semibold">24/7 Global Support</span>
-                </div>
-              </div>
-
-              {/* Quick Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-4xl mx-auto mb-16">
-                {[
-                  { number: '99.7%', label: 'Threat Prevention Rate', icon: '🛡️', color: 'from-green-400 to-emerald-400' },
-                  { number: '< 30s', label: 'Average Response Time', icon: '⚡', color: 'from-blue-400 to-cyan-400' },
-                  { number: '172', label: 'Industries Served', icon: '🏢', color: 'from-purple-400 to-pink-400' },
-                  { number: '6', label: 'Continents Protected', icon: '🌍', color: 'from-orange-400 to-red-400' }
-                ].map((stat, index) => (
-                  <div 
-                    key={index} 
-                    className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 transition-all duration-500 hover:bg-white/20 hover:scale-105 hover:border-white/40 group cursor-pointer" 
-                  >
-                    <div className="relative z-10">
-                      <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">{stat.icon}</div>
-                      <div className="text-2xl sm:text-3xl font-black text-white mb-2 group-hover:text-cyan-300 transition-colors">
-                        {stat.number}
-                      </div>
-                      <div className="text-sm text-white/70 font-medium group-hover:text-white/90 transition-colors">{stat.label}</div>
-                      
-                      {/* Bottom accent line */}
-                      <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color} scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-b-2xl`}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Enhanced Call-to-Action Buttons */}
-            <div className="flex flex-col lg:flex-row gap-8 justify-center items-center mb-12">
-              <Link 
-                href="/contact" 
-                className="group relative inline-flex items-center px-12 py-6 rounded-2xl bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold text-xl hover:shadow-2xl transform transition-all duration-500 hover:scale-110 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-2xl"></div>
-                <div className="relative flex items-center">
-                  <svg className="w-6 h-6 mr-4 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  <span className="group-hover:translate-x-1 transition-transform duration-300">Schedule Free Consultation</span>
-                  <svg className="w-6 h-6 ml-4 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </div>
-              </Link>
-
-              <Link 
-                href="/ecosystem" 
-                className="group relative inline-flex items-center px-12 py-6 rounded-2xl border-2 border-white/30 text-white font-bold text-xl backdrop-blur-sm hover:bg-white/10 hover:border-white/50 transition-all duration-300 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-white/5 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-                <div className="relative flex items-center">
-                  <svg className="w-6 h-6 mr-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                  <span className="group-hover:translate-x-1 transition-transform duration-300">Explore Security Ecosystem</span>
-                  <svg className="w-6 h-6 ml-4 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </div>
-              </Link>
-            </div>
-
-            {/* Enhanced Contact Information */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-8 text-white/70 mb-5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                </div>
-                <span className="font-medium">24/7 Expert Support</span>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span className="font-medium">Response in 30 seconds</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <span className="font-medium">Free Security Assessment</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom wave decoration */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg className="w-full h-20 text-white" fill="currentColor" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25"></path>
-            <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5"></path>
-            <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"></path>
-          </svg>
-        </div>
-      </section>
+      <CallToActionSection 
+        title="Ready to Transform"
+        subtitle="Your Security Strategy?"
+        description="Partner with the security leaders who have protected organizations for over 30 years. From strategy to implementation, we're your trusted advisors."
+        primaryButtonText="Schedule Consultation"
+        primaryButtonHref="/contact"
+        secondaryButtonText="Explore Our Story"
+        secondaryButtonHref="#mission"
+        stats={[
+          { value: "30+", label: "Years of Expertise" },
+          { value: "180+", label: "Sites Secured" },
+          { value: "24/7", label: "Expert Support" }
+        ]}
+      />
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import CallToActionSection from '@/components/CallToActionSection';
 
 // Platform data
 const platforms = [
@@ -586,18 +587,18 @@ export default function EcosystemPage() {
           <div className="absolute top-1/3 left-1/4 w-24 h-24 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full animate-bounce" style={{animationDuration: '3s'}}></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-0 lg:px-2 py-8 sm:py-12">
           <div className={`text-center transition-all duration-1000 ${
             heroInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             {/* Enhanced Badge */}
-            <div className="mb-12">
+            <div className="mb-8">
               <div className="inline-flex items-center gap-4 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-cyan-600/20 backdrop-blur-xl px-10 py-5 rounded-2xl border border-white/30 shadow-2xl hover:border-white/40 transition-all duration-300 group">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse"></div>
                   <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full animate-pulse delay-300"></div>
                 </div>
-                <span className="text-white/90 text-base font-bold uppercase tracking-wider group-hover:text-white transition-colors">Complete Security Ecosystem</span>
+                <span className="text-white/90 text-sm font-bold uppercase tracking-wider group-hover:text-white transition-colors">Complete Security Ecosystem</span>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse delay-700"></div>
                   <div className="w-3 h-3 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full animate-pulse delay-1000"></div>
@@ -606,8 +607,8 @@ export default function EcosystemPage() {
             </div>
 
             {/* Enhanced Heading */}
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-12 leading-[0.9] tracking-tight">
-              <span className="block text-white mb-6 drop-shadow-2xl relative">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+              <span className="block text-white mb-3 drop-shadow-2xl relative">
                 YUBIX
                 <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-70"></div>
               </span>
@@ -618,14 +619,14 @@ export default function EcosystemPage() {
             </h1>
 
             {/* Enhanced Subtitle */}
-            <div className="max-w-6xl mx-auto mb-16">
+            <div className="max-w-6xl mx-auto mb-8">
               <p className="text-xl sm:text-2xl lg:text-3xl text-white/85 leading-relaxed font-light mb-8">
                 Six integrated platforms delivering comprehensive security solutions from <span className="font-bold text-cyan-300">enterprise-grade protection</span> 
                 to community-focused communication and elite training programs.
               </p>
               
               {/* Trust Indicators */}
-              <div className="flex flex-wrap justify-center gap-6 text-sm text-white/70 mb-12">
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-white/70 mb-8">
                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
                   <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                   <span className="font-semibold">6 Integrated Platforms</span>
@@ -641,7 +642,7 @@ export default function EcosystemPage() {
               </div>
 
               {/* Enhanced Quick Stats Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto mb-16">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 max-w-5xl mx-auto mb-8">
                 {[
                   { number: '6', label: 'Integrated Platforms', icon: '🔗', color: 'from-blue-400 to-cyan-400' },
                   { number: '180+', label: 'Secured Sites', icon: '🏢', color: 'from-green-400 to-emerald-400' },
@@ -793,141 +794,20 @@ export default function EcosystemPage() {
         </div>
       </section>
 
-      {/* Call to Action - Enhanced Modern Design */}
-      <section className="relative py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-          <div className="absolute top-32 right-20 w-96 h-96 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-500"></div>
-        </div>
-
-        {/* Decorative Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-96 h-96 border-2 border-white/20 rounded-full"></div>
-          <div className="absolute -bottom-32 -left-32 w-128 h-128 border-2 border-white/10 rounded-full"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-white/5 rounded-full"></div>
-        </div>
-
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6 border border-white/30">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-              Trusted by 180+ Organizations Worldwide
-            </div>
-
-            {/* Main Heading */}
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Ready to{' '}
-              <span className="relative">
-                <span className="bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
-                  Secure
-                </span>
-                <div className="absolute bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-cyan-300 to-blue-300 rounded-full opacity-50"></div>
-              </span>{' '}
-              Your Future?
-            </h2>
-
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-4xl mx-auto leading-relaxed font-light">
-              Join the global network of organizations who trust YUBIX for their security infrastructure. 
-              Our expert team is ready to design the perfect platform combination for your unique needs.
-            </p>
-
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">180+</div>
-                <div className="text-blue-200 text-sm">Secured Sites</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">172</div>
-                <div className="text-blue-200 text-sm">Industry Sectors</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">99.9%</div>
-                <div className="text-blue-200 text-sm">Uptime Record</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-2">24/7</div>
-                <div className="text-blue-200 text-sm">Expert Support</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Enhanced Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link
-              href="/contact"
-              className="group relative inline-flex items-center px-10 py-5 rounded-2xl bg-white text-blue-600 font-bold text-lg hover:shadow-2xl transform transition-all duration-500 hover:scale-105 overflow-hidden"
-            >
-              {/* Button background animation */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-cyan-50 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left rounded-2xl"></div>
-              
-              <div className="relative flex items-center">
-                <svg className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span className="group-hover:translate-x-1 transition-transform duration-300">
-                  Schedule Free Consultation
-                </span>
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
-              
-              {/* Ripple effect */}
-              <div className="absolute inset-0 bg-blue-600/10 rounded-2xl scale-0 group-active:scale-100 transition-transform duration-150"></div>
-            </Link>
-
-            <Link
-              href="/services"
-              className="group relative inline-flex items-center px-10 py-5 rounded-2xl border-2 border-white/30 text-white font-bold text-lg backdrop-blur-sm hover:bg-white/10 hover:border-white/50 transition-all duration-300 overflow-hidden"
-            >
-              {/* Background hover effect */}
-              <div className="absolute inset-0 bg-white/5 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-2xl"></div>
-              
-              <div className="relative flex items-center">
-                <svg className="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <span className="group-hover:translate-x-1 transition-transform duration-300">
-                  Explore All Services
-                </span>
-              </div>
-            </Link>
-          </div>
-
-          {/* Additional Info */}
-          <div className="text-center mt-12">
-            <p className="text-blue-200 text-sm mb-4">
-              🔒 ISO 27001 Certified • ⚡ Enterprise-Grade Security • 🌍 Global Support
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 text-blue-300 text-xs">
-              <span className="flex items-center">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                Free Security Assessment
-              </span>
-              <span className="flex items-center">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                No Long-term Contracts
-              </span>
-              <span className="flex items-center">
-                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                Expert Implementation Support
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom wave decoration */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg className="w-full h-12 text-gray-50" fill="currentColor" viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"></path>
-          </svg>
-        </div>
-      </section>
+      <CallToActionSection 
+        title="Ready to Build"
+        subtitle="Your Complete Security Ecosystem?"
+        description="Discover how our 6 integrated platforms work together to create a comprehensive security solution tailored to your organization's unique needs."
+        primaryButtonText="Explore the Ecosystem"
+        primaryButtonHref="/contact"
+        secondaryButtonText="View Platform Details"
+        secondaryButtonHref="#platforms"
+        stats={[
+          { value: "180+", label: "Secured Sites" },
+          { value: "172", label: "Industry Sectors" },
+          { value: "24/7", label: "Expert Support" }
+        ]}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import CallToActionSection from '@/components/CallToActionSection';
 
 // Custom hook for intersection observer
 const useIntersectionObserver = (options = {}) => {
@@ -266,6 +267,7 @@ const ServiceCard = ({ service, index }: { service: typeof services[0], index: n
 
   return (
     <div
+      id={service.id}
       ref={ref}
       className={`group relative bg-white/90 backdrop-blur-sm rounded-3xl border border-gray-100/50 overflow-hidden transition-all duration-700 ease-out ${
         isIntersecting ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
@@ -618,12 +620,12 @@ export default function ServicesPage() {
           }}></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-0 lg:px-2 py-8 sm:py-12">
           <div className={`text-center transition-all duration-1000 ${
             heroInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}>
             {/* Badge */}
-            <div className="mb-12">
+            <div className="mb-8">
               <div className="inline-flex items-center gap-4 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-cyan-600/20 backdrop-blur-xl px-10 py-5 rounded-2xl border border-white/30 shadow-2xl">
                 <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse"></div>
                 <span className="text-white/90 text-sm font-bold uppercase tracking-wider">Professional Services</span>
@@ -632,8 +634,8 @@ export default function ServicesPage() {
             </div>
 
             {/* Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-12 leading-[1.1] tracking-tight">
-              <span className="block text-white mb-6 drop-shadow-2xl">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+              <span className="block text-white mb-3 drop-shadow-2xl">
                 Expert
               </span>
               <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl pb-2">
@@ -656,7 +658,7 @@ export default function ServicesPage() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-8">
               <Link
                 href="#services"
                 className="group relative inline-flex items-center px-10 py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-lg hover:shadow-2xl transform transition-all duration-500 hover:scale-105 overflow-hidden"
@@ -719,7 +721,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Service Packages */}
-      <section className="py-16 bg-gray-50">
+      <section id="packages" className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
@@ -740,7 +742,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Case Studies */}
-      <section className="py-24 bg-white relative overflow-hidden">
+      <section id="case-studies" className="py-24 bg-white relative overflow-hidden">
         {/* Subtle Background Elements */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute top-32 left-1/4 w-72 h-72 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-3xl" />
@@ -862,54 +864,21 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative py-24 bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-600 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-72 h-72 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
-        </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6 border border-white/30">
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-            Ready to Get Started?
-          </div>
-
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Let&apos;s Build Your
-            <span className="block bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
-              Security Future
-            </span>
-          </h2>
-
-          <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto">
-            Our team of security experts is ready to assess your needs and design the perfect solution.
-            Schedule a free consultation to get started.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link
-              href="/contact"
-              className="group relative inline-flex items-center px-10 py-5 rounded-2xl bg-white text-blue-600 font-bold text-lg hover:shadow-2xl transform transition-all duration-500 hover:scale-105"
-            >
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              Schedule Free Consultation
-            </Link>
-
-            <Link
-              href="/ecosystem"
-              className="group relative inline-flex items-center px-10 py-5 rounded-2xl border-2 border-white/30 text-white font-bold text-lg backdrop-blur-sm hover:bg-white/10"
-            >
-              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              View Platform Ecosystem
-            </Link>
-          </div>
-        </div>
-      </section>
+      <CallToActionSection 
+        title="Ready to Enhance"
+        subtitle="Your Security Operations?"
+        description="From strategic advisory to custom development, our expert services team delivers tailored solutions that strengthen your security posture and accelerate your digital transformation."
+        primaryButtonText="Start Your Project"
+        primaryButtonHref="/contact"
+        secondaryButtonText="View Case Studies"
+        secondaryButtonHref="/about"
+        stats={[
+          { value: "100+", label: "Projects Delivered" },
+          { value: "95%", label: "Client Satisfaction" },
+          { value: "24/7", label: "Project Support" }
+        ]}
+      />
     </div>
   );
 }

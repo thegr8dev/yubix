@@ -2,6 +2,27 @@
 
 import Link from 'next/link'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
+
+interface MenuDropdownLink {
+  name: string;
+  href: string;
+}
+
+interface MenuDropdownSection {
+  title: string;
+  links: MenuDropdownLink[];
+}
+
+interface MenuDropdown {
+  sections: MenuDropdownSection[];
+}
+
+interface MenuItem {
+  name: string;
+  href: string;
+  dropdown?: MenuDropdown | null;
+}
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -11,10 +32,78 @@ export default function Header() {
   const [lastScrollY, setLastScrollY] = useState(0)
   const headerRef = useRef<HTMLElement>(null)
   const menuItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+  const pathname = usePathname()
+
+  // Function to check if a menu item is active
+  const isMenuItemActive = (item: MenuItem) => {
+    // Direct path match
+    if (pathname === item.href) {
+      return true
+    }
+    
+    // Check dropdown links for active state
+    if (item.dropdown) {
+      for (const section of item.dropdown.sections) {
+        for (const link of section.links) {
+          // Extract the base path from the link (remove anchor)
+          const linkPath = link.href.split('#')[0]
+          
+          // Special handling: Only consider dropdown link matches if this menu item
+          // is the primary owner of that path (i.e., its main href matches the linkPath)
+          if (linkPath && pathname === linkPath && item.href === linkPath) {
+            return true
+          }
+        }
+      }
+    }
+    
+    return false
+  }
+
+  // Function to check if a specific dropdown link is active
+  const isDropdownLinkActive = (linkHref: string) => {
+    if (linkHref.includes('#')) {
+      const linkPath = linkHref.split('#')[0]
+      return pathname === linkPath
+    }
+    return pathname === linkHref
+  }
 
   const closeMenu = () => {
     setIsMenuOpen(false)
     setActiveDropdown(null)
+  }
+
+  // Handle smooth scrolling with header offset
+  const handleAnchorClick = (href: string) => {
+    // Close dropdown/menu first
+    setActiveDropdown(null)
+    setIsMenuOpen(false)
+    
+    // If it's an anchor link to the current page or another page
+    if (href.includes('#')) {
+      const [path, hash] = href.split('#')
+      const isCurrentPage = path === '' || path === window.location.pathname
+      
+      if (isCurrentPage) {
+        // Same page - smooth scroll to element
+        setTimeout(() => {
+          const element = document.getElementById(hash)
+          if (element) {
+            const headerOffset = headerHeight + 20 // Add some padding
+            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+            const offsetPosition = elementPosition - headerOffset
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            })
+          }
+        }, 100)
+        return false // Prevent default navigation
+      }
+    }
+    return true // Allow default navigation
   }
 
   const handleMouseEnter = (itemName: string) => {
@@ -77,6 +166,32 @@ export default function Header() {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [activeDropdown, isMenuOpen, lastScrollY])
+
+  // Clear dropdown state when pathname changes
+  useEffect(() => {
+    setActiveDropdown(null)
+    setIsMenuOpen(false)
+  }, [pathname])
+
+  // Handle hash navigation on page load
+  useEffect(() => {
+    const hash = window.location.hash.slice(1)
+    if (hash) {
+      setTimeout(() => {
+        const element = document.getElementById(hash)
+        if (element) {
+          const headerOffset = headerHeight + 20
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+          const offsetPosition = elementPosition - headerOffset
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          })
+        }
+      }, 500) // Wait for page to fully load
+    }
+  }, [headerHeight])
 
   // Handle click outside and escape key
   useEffect(() => {
@@ -151,18 +266,18 @@ export default function Header() {
             title: 'Company',
             links: [
               { name: 'About Us', href: '/about' },
-              { name: 'Mission & Vision', href: '/about/mission' },
-              { name: 'Leadership Team', href: '/about/team' },
-              { name: 'Careers', href: '/about/careers' }
+              { name: 'Mission & Vision', href: '/about#mission' },
+              { name: 'Leadership Team', href: '/about#leadership' },
+              { name: 'Company Timeline', href: '/about#timeline' }
             ]
           },
           {
             title: 'Trust & Security',
             links: [
-              { name: 'Security Framework', href: '/about/security' },
-              { name: 'Privacy Policy', href: '/about/privacy' },
-              { name: 'Compliance', href: '/about/compliance' },
-              { name: 'Certifications', href: '/certifications' }
+              { name: 'ISO Certifications', href: '/about#certifications' },
+              { name: 'Our Values', href: '/about#mission' },
+              { name: 'Global Presence', href: '/about#certifications' },
+              { name: 'Contact Us', href: '/contact' }
             ]
           }
         ]
@@ -176,11 +291,11 @@ export default function Header() {
           {
             title: 'Platforms',
             links: [
-              { name: 'Vertex Pro', href: '/ecosystem/vertex-pro' },
-              { name: 'Buzz World', href: '/ecosystem/buzz-world' },
-              { name: 'BYONN', href: '/ecosystem/byonn' },
-              { name: 'Fortalyx', href: '/ecosystem/fortalyx' },
-              { name: 'Security Hub', href: '/ecosystem/security-hub' }
+              { name: 'Vertex Pro', href: '#' },
+              { name: 'Buzz World', href: '#' },
+              { name: 'BYONN', href: '#' },
+              { name: 'Fortalyx', href: '#' },
+              { name: 'Security Hub', href: '#' }
             ]
           }
         ]
@@ -194,11 +309,20 @@ export default function Header() {
           {
             title: 'Our Services',
             links: [
-              { name: 'Advisory', href: '/services/advisory' },
-              { name: 'Custom Development', href: '/services/custom-development' },
-              { name: 'AI Integration', href: '/services/ai-integration' },
-              { name: 'Training', href: '/services/training' },
-              { name: 'Simulations', href: '/services/simulations' }
+              { name: 'Security Advisory', href: '/services#security-advisory' },
+              { name: 'Custom Development', href: '/services#custom-development' },
+              { name: 'AI Integration', href: '/services#ai-integration' },
+              { name: 'Training & Simulations', href: '/services#simulations-drills' },
+              { name: 'All Services', href: '/services#services' }
+            ]
+          },
+          {
+            title: 'Resources',
+            links: [
+              { name: 'Service Packages', href: '/services#packages' },
+              { name: 'Case Studies', href: '/services#case-studies' },
+              { name: 'Get Quote', href: '/contact' },
+              { name: 'Schedule Demo', href: '/contact' }
             ]
           }
         ]
@@ -212,12 +336,12 @@ export default function Header() {
           {
             title: 'Sectors We Serve',
             links: [
-              { name: 'Aviation', href: '/industries/aviation' },
-              { name: 'Corporate', href: '/industries/corporate' },
-              { name: 'Government', href: '/industries/government' },
-              { name: 'Healthcare', href: '/industries/healthcare' },
-              { name: 'Education', href: '/industries/education' },
-              { name: 'Hospitality', href: '/industries/hospitality' }
+              { name: 'Aviation', href: '/industries#aviation' },
+              { name: 'Corporate', href: '/industries#corporate' },
+              { name: 'Government', href: '/industries#government' },
+              { name: 'Healthcare', href: '/industries#healthcare' },
+              { name: 'Education', href: '/industries#education' },
+              { name: 'Hospitality', href: '/industries#hospitality' }
             ]
           }
         ]
@@ -231,19 +355,19 @@ export default function Header() {
           {
             title: 'Research & Development',
             links: [
-              { name: 'AI Research', href: '/innovation/ai-research' },
-              { name: 'Emerging Threats', href: '/innovation/threats' },
-              { name: 'Future Technologies', href: '/innovation/future-tech' },
-              { name: 'Research Papers', href: '/innovation/papers' }
+              { name: 'AI Research', href: '/innovation#ai-research' },
+              { name: 'Emerging Threats', href: '/innovation#emerging-threats' },
+              { name: 'Future Technologies', href: '/innovation#future-tech' },
+              { name: 'Research Papers', href: '/innovation#research-papers' }
             ]
           },
           {
             title: 'Experimental Solutions',
             links: [
-              { name: 'Beta Programs', href: '/innovation/beta' },
-              { name: 'Proof of Concepts', href: '/innovation/poc' },
-              { name: 'Innovation Partners', href: '/innovation/partners' },
-              { name: 'Developer APIs', href: '/innovation/apis' }
+              { name: 'Beta Programs', href: '/innovation#beta-programs' },
+              { name: 'Proof of Concepts', href: '/innovation#proof-of-concepts' },
+              { name: 'Innovation Partners', href: '/innovation#innovation-partners' },
+              { name: 'Developer APIs', href: '/innovation#developer-apis' }
             ]
           }
         ]
@@ -257,19 +381,19 @@ export default function Header() {
           {
             title: 'Crisis Response',
             links: [
-              { name: '24/7 SOC', href: '/operations/soc' },
-              { name: 'Incident Response', href: '/operations/incident' },
-              { name: 'Emergency Support', href: '/operations/emergency' },
-              { name: 'Threat Intelligence', href: '/operations/intelligence' }
+              { name: '24/7 SOC', href: '/operations#soc' },
+              { name: 'Incident Response', href: '/operations#incident' },
+              { name: 'Emergency Support', href: '/operations#emergency' },
+              { name: 'Threat Intelligence', href: '/operations#intelligence' }
             ]
           },
           {
             title: 'Real-time Support',
             links: [
-              { name: 'Live Monitoring', href: '/operations/monitoring' },
-              { name: 'Rapid Response', href: '/operations/response' },
-              { name: 'Status Dashboard', href: '/operations/status' },
-              { name: 'Contact Operations', href: '/operations/contact' }
+              { name: 'Live Monitoring', href: '/operations#monitoring' },
+              { name: 'Rapid Response', href: '/operations#response' },
+              { name: 'Status Dashboard', href: '/operations#status' },
+              { name: 'Contact Operations', href: '/operations#contact-operations' }
             ]
           }
         ]
@@ -283,19 +407,19 @@ export default function Header() {
           {
             title: 'Certifications',
             links: [
-              { name: 'ISO 27001', href: '/certifications/iso-27001' },
-              { name: 'SOC 2 Type II', href: '/certifications/soc2' },
-              { name: 'GDPR Compliance', href: '/certifications/gdpr' },
-              { name: 'Industry Standards', href: '/certifications/standards' }
+              { name: 'ISO 27001', href: '/certifications#iso-27001' },
+              { name: 'SOC 2 Type II', href: '/certifications#soc2' },
+              { name: 'GDPR Compliance', href: '/certifications#gdpr' },
+              { name: 'Industry Standards', href: '/certifications#standards' }
             ]
           },
           {
             title: 'Funding & Grants',
             links: [
-              { name: 'Grant Opportunities', href: '/certifications/grants' },
-              { name: 'Funding Programs', href: '/certifications/funding' },
-              { name: 'Partnership Benefits', href: '/certifications/benefits' },
-              { name: 'Application Process', href: '/certifications/application' }
+              { name: 'Grant Opportunities', href: '/certifications#grants' },
+              { name: 'Funding Programs', href: '/certifications#funding' },
+              { name: 'Partnership Benefits', href: '/certifications#benefits' },
+              { name: 'Application Process', href: '/certifications#application' }
             ]
           }
         ]
@@ -309,19 +433,19 @@ export default function Header() {
           {
             title: 'Get in Touch',
             links: [
-              { name: 'Contact Form', href: '/contact' },
-              { name: 'Office Locations', href: '/contact/locations' },
-              { name: 'Phone & Email', href: '/contact/direct' },
-              { name: 'Sales Inquiry', href: '/contact/sales' }
+              { name: 'Contact Form', href: '/contact#contact-form' },
+              { name: 'Office Locations', href: '/contact#locations' },
+              { name: 'Phone & Email', href: '/contact#direct' },
+              { name: 'Sales Inquiry', href: '/contact#sales' }
             ]
           },
           {
             title: 'Book Consultation',
             links: [
-              { name: 'Free Assessment', href: '/contact/assessment' },
-              { name: 'Demo Request', href: '/contact/demo' },
-              { name: 'Custom Solution', href: '/contact/custom' },
-              { name: 'Enterprise Meeting', href: '/contact/enterprise' }
+              { name: 'Free Assessment', href: '/contact#assessment' },
+              { name: 'Demo Request', href: '/contact#demo' },
+              { name: 'Custom Solution', href: '/contact#custom' },
+              { name: 'Enterprise Meeting', href: '/contact#enterprise' }
             ]
           }
         ]
@@ -358,10 +482,14 @@ export default function Header() {
                   <Link
                     href={item.href}
                     className={`
-                      px-3 py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] 
-                      transition-all duration-200 font-medium rounded-md hover:bg-[var(--color-neutral-100)] 
+                      px-3 py-2 transition-all duration-200 font-medium rounded-md 
                       flex items-center gap-1 whitespace-nowrap text-sm
-                      ${activeDropdown === item.name ? 'text-[var(--color-primary)] bg-[var(--color-neutral-100)]' : ''}
+                      ${isMenuItemActive(item) 
+                        ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold' 
+                        : activeDropdown === item.name 
+                          ? 'text-[var(--color-primary)] bg-[var(--color-neutral-100)]'
+                          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
+                      }
                     `}
                   >
                     {item.name}
@@ -417,7 +545,11 @@ export default function Header() {
                                     <Link
                                       href={link.href}
                                       className="group/link flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all duration-200 py-2 px-3 rounded-lg hover:bg-[var(--color-neutral-100)]"
-                                      onClick={() => setActiveDropdown(null)}
+                                      onClick={(e) => {
+                                        if (!handleAnchorClick(link.href)) {
+                                          e.preventDefault()
+                                        }
+                                      }}
                                     >
                                       <svg 
                                         className="w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" 
@@ -554,7 +686,11 @@ export default function Header() {
                 >
                   <Link 
                     href={item.href}
-                    className="group flex items-center justify-between text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all duration-200 font-medium py-4 px-6 hover:bg-[var(--color-neutral-100)] border-b border-[var(--color-border-light)] relative overflow-hidden"
+                    className={`group flex items-center justify-between transition-all duration-200 font-medium py-4 px-6 border-b border-[var(--color-border-light)] relative overflow-hidden ${
+                      isMenuItemActive(item)
+                        ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold'
+                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
+                    }`}
                     onClick={closeMenu}
                   >
                     {/* Hover effect background */}
@@ -612,15 +748,23 @@ export default function Header() {
                               <Link
                                 key={link.name}
                                 href={link.href}
-                                className={`group/link block text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all duration-200 py-2 px-4 rounded-md hover:bg-white/80 text-sm relative overflow-hidden transform ${
+                                className={`group/link block transition-all duration-200 py-2 px-4 rounded-md text-sm relative overflow-hidden transform ${
                                   isMenuOpen 
                                     ? 'translate-x-0 opacity-100' 
                                     : 'translate-x-4 opacity-0'
+                                } ${
+                                  isDropdownLinkActive(link.href)
+                                    ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold'
+                                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-white/80'
                                 }`}
                                 style={{ 
                                   transitionDelay: isMenuOpen ? `${(index + sectionIndex + linkIndex + 3) * 20}ms` : '0ms' 
                                 }}
-                                onClick={closeMenu}
+                                onClick={(e) => {
+                                  if (!handleAnchorClick(link.href)) {
+                                    e.preventDefault()
+                                  }
+                                }}
                               >
                                 {/* Link hover background */}
                                 <div className="absolute inset-0 bg-[var(--color-primary)]/5 scale-x-0 group-hover/link:scale-x-100 transition-transform duration-200 origin-left rounded-md" />
