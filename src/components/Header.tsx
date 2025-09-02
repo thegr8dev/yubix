@@ -24,7 +24,8 @@ import {
   BeakerIcon,
   CpuChipIcon,
   MagnifyingGlassIcon,
-  PresentationChartLineIcon
+  PresentationChartLineIcon,
+  CommandLineIcon
 } from '@heroicons/react/24/outline'
 
 interface MenuDropdownLink {
@@ -189,32 +190,11 @@ export default function Header() {
       }
     },
     {
-      name: 'Innovation',
-      href: '/innovation',
-      description: 'Cutting-edge technology',
-      icon: RocketLaunchIcon,
-      dropdown: {
-        sections: [
-          {
-            title: 'Research & Development',
-            links: [
-              { name: 'AI Research', href: '/innovation#ai-research', description: 'Artificial intelligence', icon: CpuChipIcon },
-              { name: 'Emerging Threats', href: '/innovation#emerging-threats', description: 'Future security risks', icon: ExclamationTriangleIcon },
-              { name: 'Future Technologies', href: '/innovation#future-tech', description: 'Next-gen solutions', icon: RocketLaunchIcon },
-              { name: 'Research Papers', href: '/innovation#research-papers', description: 'Published research', icon: DocumentTextIcon }
-            ]
-          },
-          {
-            title: 'Experimental Solutions',
-            links: [
-              { name: 'Beta Programs', href: '/innovation#beta-programs', description: 'Early access testing', icon: BeakerIcon },
-              { name: 'Proof of Concepts', href: '/innovation#proof-of-concepts', description: 'Prototype solutions', icon: PresentationChartLineIcon },
-              { name: 'Tech Previews', href: '/innovation#tech-previews', description: 'Coming soon features', icon: EyeIcon },
-              { name: 'Innovation Lab', href: '/innovation#innovation-lab', description: 'R&D facility', icon: BuildingOfficeIcon }
-            ]
-          }
-        ]
-      }
+      name: 'Ops-room',
+      href: '/ops-room',
+      description: 'Operations control center',
+      icon: CommandLineIcon,
+      dropdown: null
     },
     {
       name: 'Contact',
@@ -296,6 +276,34 @@ export default function Header() {
       dropdown: null
     },
     {
+      name: 'Innovation',
+      href: '/innovation',
+      description: 'Cutting-edge technology',
+      icon: RocketLaunchIcon,
+      dropdown: {
+        sections: [
+          {
+            title: 'Research & Development',
+            links: [
+              { name: 'AI Research', href: '/innovation#ai-research', description: 'Artificial intelligence', icon: CpuChipIcon },
+              { name: 'Emerging Threats', href: '/innovation#emerging-threats', description: 'Future security risks', icon: ExclamationTriangleIcon },
+              { name: 'Future Technologies', href: '/innovation#future-tech', description: 'Next-gen solutions', icon: RocketLaunchIcon },
+              { name: 'Research Papers', href: '/innovation#research-papers', description: 'Published research', icon: DocumentTextIcon }
+            ]
+          },
+          {
+            title: 'Experimental Solutions',
+            links: [
+              { name: 'Beta Programs', href: '/innovation#beta-programs', description: 'Early access testing', icon: BeakerIcon },
+              { name: 'Proof of Concepts', href: '/innovation#proof-of-concepts', description: 'Prototype solutions', icon: PresentationChartLineIcon },
+              { name: 'Tech Previews', href: '/innovation#tech-previews', description: 'Coming soon features', icon: EyeIcon },
+              { name: 'Innovation Lab', href: '/innovation#innovation-lab', description: 'R&D facility', icon: BuildingOfficeIcon }
+            ]
+          }
+        ]
+      }
+    },
+    {
       name: 'Investors',
       href: '/investors',
       description: 'Investor relations',
@@ -353,7 +361,7 @@ export default function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-4">
               {/* Primary Menu Items */}
               {primaryMenuItems.map((item, index) => (
                 <div key={item.name} className="relative">
@@ -392,8 +400,11 @@ export default function Header() {
                   {/* Mega Menu Dropdown */}
                   {item.dropdown && activeDropdown === item.name && (
                     <div className={`absolute top-full mt-2 w-[600px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 ${
-                      index >= primaryMenuItems.length - 2 
+                      // Automatic positioning based on menu position
+                      index >= primaryMenuItems.length - 1 
                         ? 'right-0' 
+                        : index === 0 
+                        ? 'left-0'
                         : 'left-1/2 transform -translate-x-1/2'
                     }`}>
                       <div className="p-8">
@@ -403,7 +414,7 @@ export default function Header() {
                           <p className="text-gray-600">{item.description}</p>
                         </div>
                         
-                        {/* Sections */}
+                        {/* Sections - Consistent 2-column layout for all menus */}
                         <div className="grid grid-cols-2 gap-8">
                           {item.dropdown.sections.map((section) => (
                             <div key={section.title}>
@@ -418,9 +429,7 @@ export default function Header() {
                                     className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
                                     onClick={() => setActiveDropdown(null)}
                                   >
-                                    <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                                      'bg-gray-100'
-                                    }`}>
+                                    <span className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100">
                                       {link.icon && React.createElement(link.icon, { className: "w-4 h-4" })}
                                     </span>
                                     <div>
@@ -464,14 +473,21 @@ export default function Header() {
 
                 {/* More Menu Dropdown */}
                 {showMoreMenu && (
-                  <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                    <div className="p-4">
-                      <div className="grid grid-cols-1 gap-1">
+                  <div className="absolute top-full right-0 mt-2 w-[600px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                    <div className="p-8">
+                      {/* Header */}
+                      <div className="mb-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">More</h3>
+                        <p className="text-gray-600">Additional pages and resources</p>
+                      </div>
+                      
+                      {/* Horizontal grid layout for all items */}
+                      <div className="grid grid-cols-3 gap-4">
                         {secondaryMenuItems.map((item) => (
                           <Link
                             key={item.name}
                             href={item.href}
-                            className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 ${
+                            className={`flex items-center space-x-3 p-4 rounded-lg transition-colors duration-200 group ${
                               isMenuItemActive(item)
                                 ? 'bg-blue-50 text-blue-600'
                                 : 'text-gray-700 hover:bg-gray-50'
@@ -481,14 +497,20 @@ export default function Header() {
                             <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
                               isMenuItemActive(item)
                                 ? 'bg-blue-100'
-                                : 'bg-gray-100'
+                                : 'bg-gray-100 group-hover:bg-blue-50'
                             }`}>
-                              {item.icon && React.createElement(item.icon, { className: "w-4 h-4" })}
+                              {item.icon && React.createElement(item.icon, { 
+                                className: `w-4 h-4 ${isMenuItemActive(item) ? 'text-blue-600' : 'text-gray-600 group-hover:text-blue-600'}` 
+                              })}
                             </span>
-                            <div>
-                              <div className="font-medium">{item.name}</div>
+                            <div className="min-w-0 flex-1">
+                              <div className={`font-medium transition-colors duration-200 ${
+                                isMenuItemActive(item) ? 'text-blue-600' : 'text-gray-900 group-hover:text-blue-600'
+                              }`}>
+                                {item.name}
+                              </div>
                               {item.description && (
-                                <div className="text-sm text-gray-500">{item.description}</div>
+                                <div className="text-sm text-gray-500 mt-1 leading-tight">{item.description}</div>
                               )}
                             </div>
                           </Link>
@@ -519,7 +541,7 @@ export default function Header() {
       </nav>
 
       {/* Mobile Navigation Slider Drawer */}
-      <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
+      <div className={`fixed top-0 right-0 h-full w-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
         isMenuOpen ? 'translate-x-0' : 'translate-x-full'
       }`}>
         {/* Drawer Header */}
