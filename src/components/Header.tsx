@@ -30,6 +30,7 @@ export default function Header() {
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
   const [headerHeight, setHeaderHeight] = useState(64)
   const [lastScrollY, setLastScrollY] = useState(0)
+  const [isDropdownHovered, setIsDropdownHovered] = useState(false)
   const headerRef = useRef<HTMLElement>(null)
   const menuItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const pathname = usePathname()
@@ -58,6 +59,11 @@ export default function Header() {
     }
     
     return false
+  }
+
+  // Function to check if any secondary menu item is active (for "More" button)
+  const isSecondaryMenuActive = () => {
+    return secondaryMenuItems.some(item => isMenuItemActive(item))
   }
 
   // Function to check if a specific dropdown link is active
@@ -130,9 +136,11 @@ export default function Header() {
       clearTimeout(hoverTimeout)
       setHoverTimeout(null)
     }
+    setIsDropdownHovered(true)
   }
 
   const handleDropdownMouseLeave = () => {
+    setIsDropdownHovered(false)
     // Shorter delay for dropdown as well
     const timeout = setTimeout(() => {
       setActiveDropdown(null)
@@ -145,8 +153,8 @@ export default function Header() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
       
-      // Close dropdown when scrolling
-      if (activeDropdown && Math.abs(currentScrollY - lastScrollY) > 5) {
+      // Only close dropdown when scrolling the main page and user is not hovering over dropdown
+      if (activeDropdown && !isDropdownHovered && Math.abs(currentScrollY - lastScrollY) > 20) {
         setActiveDropdown(null)
       }
       
@@ -165,7 +173,7 @@ export default function Header() {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [activeDropdown, isMenuOpen, lastScrollY])
+  }, [activeDropdown, isMenuOpen, lastScrollY, isDropdownHovered])
 
   // Clear dropdown state when pathname changes
   useEffect(() => {
@@ -240,6 +248,12 @@ export default function Header() {
     if (!itemRef) return { left: '50%', transform: 'translateX(-50%)' }
     
     const rect = itemRef.getBoundingClientRect()
+    
+    // Special handling for "More" button - always align to the right with proper spacing
+    if (itemName === 'More') {
+      return { right: '20px' }
+    }
+    
     if (isLastTwo) {
       return { right: window.innerWidth - rect.right + 'px' }
     } else {
@@ -251,7 +265,8 @@ export default function Header() {
     menuItemRefs.current[itemName] = el
   }, [])
 
-  const menuItems = [
+  // Primary navigation items (always visible on desktop)
+  const primaryMenuItems = [
     {
       name: 'Home',
       href: '/',
@@ -278,24 +293,6 @@ export default function Header() {
               { name: 'Our Values', href: '/about#mission' },
               { name: 'Global Presence', href: '/about#certifications' },
               { name: 'Contact Us', href: '/contact' }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      name: 'Ecosystem',
-      href: '/ecosystem',
-      dropdown: {
-        sections: [
-          {
-            title: 'Platforms',
-            links: [
-              { name: 'Vertex Pro', href: '#' },
-              { name: 'Buzz World', href: '#' },
-              { name: 'BYONN', href: '#' },
-              { name: 'Fortalyx', href: '#' },
-              { name: 'Security Hub', href: '#' }
             ]
           }
         ]
@@ -329,6 +326,11 @@ export default function Header() {
       }
     },
     {
+      name: 'Ops Room',
+      href: '/ops-room',
+      dropdown: null
+    },
+    {
       name: 'Industries',
       href: '/industries',
       dropdown: {
@@ -342,6 +344,54 @@ export default function Header() {
               { name: 'Healthcare', href: '/industries#healthcare' },
               { name: 'Education', href: '/industries#education' },
               { name: 'Hospitality', href: '/industries#hospitality' }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      name: 'Contact',
+      href: '/contact',
+      dropdown: {
+        sections: [
+          {
+            title: 'Get in Touch',
+            links: [
+              { name: 'Contact Form', href: '/contact#contact-form' },
+              { name: 'Office Locations', href: '/contact#locations' },
+              { name: 'Phone & Email', href: '/contact#direct' },
+              { name: 'Sales Inquiry', href: '/contact#sales' }
+            ]
+          },
+          {
+            title: 'Book Consultation',
+            links: [
+              { name: 'Free Assessment', href: '/contact#assessment' },
+              { name: 'Demo Request', href: '/contact#demo' },
+              { name: 'Custom Solution', href: '/contact#custom' },
+              { name: 'Enterprise Meeting', href: '/contact#enterprise' }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+
+  // Secondary navigation items (moved to hamburger menu on desktop)
+  const secondaryMenuItems = [
+    {
+      name: 'Ecosystem',
+      href: '/ecosystem',
+      dropdown: {
+        sections: [
+          {
+            title: 'Platforms',
+            links: [
+              { name: 'Vertex Pro', href: '#' },
+              { name: 'Buzz World', href: '#' },
+              { name: 'BYONN', href: '#' },
+              { name: 'Fortalyx', href: '#' },
+              { name: 'Security Hub', href: '#' }
             ]
           }
         ]
@@ -424,51 +474,29 @@ export default function Header() {
           }
         ]
       }
-    },
-    {
-      name: 'Contact',
-      href: '/contact',
-      dropdown: {
-        sections: [
-          {
-            title: 'Get in Touch',
-            links: [
-              { name: 'Contact Form', href: '/contact#contact-form' },
-              { name: 'Office Locations', href: '/contact#locations' },
-              { name: 'Phone & Email', href: '/contact#direct' },
-              { name: 'Sales Inquiry', href: '/contact#sales' }
-            ]
-          },
-          {
-            title: 'Book Consultation',
-            links: [
-              { name: 'Free Assessment', href: '/contact#assessment' },
-              { name: 'Demo Request', href: '/contact#demo' },
-              { name: 'Custom Solution', href: '/contact#custom' },
-              { name: 'Enterprise Meeting', href: '/contact#enterprise' }
-            ]
-          }
-        ]
-      }
     }
   ]
 
+  // All menu items combined (for mobile)
+  const allMenuItems = [...primaryMenuItems, ...secondaryMenuItems]
+
   return (
     <header ref={headerRef} className="bg-white shadow-md sticky top-0 z-[99999] overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
-        <div className="flex items-center justify-between py-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 min-w-0">
+        <div className="flex items-center justify-between py-3 md:py-4">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors">
+            <Link href="/" className="text-lg sm:text-xl font-bold text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors">
               YUBIX
             </Link>
           </div>
           
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-0.5 flex-1 justify-center">
-            {menuItems.map((item, index) => {
+          {/* Desktop Navigation - Hidden on mobile and tablet, shown on lg+ */}
+          <nav className="hidden lg:flex items-center space-x-0.5 flex-1 justify-center max-w-4xl mx-auto">
+            {/* Primary Menu Items */}
+            {primaryMenuItems.map((item, index) => {
               // Calculate positioning for the dropdown
-              const isLastTwoItems = index >= menuItems.length - 2
+              const isLastTwoItems = index >= primaryMenuItems.length - 2
               const dropdownPosition = getDropdownPosition(item.name, isLastTwoItems)
               
               return (
@@ -589,15 +617,155 @@ export default function Header() {
                 </div>
               )
             })}
+
+            {/* More Menu Button - Desktop Hamburger */}
+            <div 
+              className="relative"
+              ref={setMenuItemRef('More')}
+              onMouseEnter={() => handleMouseEnter('More')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button
+                className={`
+                  px-3 py-2 transition-all duration-200 font-medium rounded-md 
+                  flex items-center gap-1 whitespace-nowrap text-sm
+                  ${isSecondaryMenuActive() 
+                    ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold' 
+                    : activeDropdown === 'More' 
+                      ? 'text-[var(--color-primary)] bg-[var(--color-neutral-100)]'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
+                  }
+                `}
+              >
+                More
+                <svg 
+                  className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'More' ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* More Menu Dropdown */}
+              {activeDropdown === 'More' && (
+                <div 
+                  data-dropdown="more-menu"
+                  className="fixed w-[640px] bg-white border border-[var(--color-border-light)] rounded-xl shadow-2xl overflow-hidden"
+                  style={{ 
+                    top: `${headerHeight + 8}px`,
+                    zIndex: 999999,
+                    maxWidth: 'calc(100vw - 40px)',
+                    ...getDropdownPosition('More', true)
+                  }}
+                  onMouseEnter={handleDropdownMouseEnter}
+                  onMouseLeave={handleDropdownMouseLeave}
+                >
+                  {/* Dropdown Header */}
+                  <div className="bg-gradient-to-r from-[var(--color-neutral)] to-[var(--color-neutral-100)] px-6 py-4 border-b border-[var(--color-border-light)]">
+                    <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                      More Services
+                    </h2>
+                    <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+                      Explore additional offerings and specialized services
+                    </p>
+                  </div>
+                  
+                  {/* Dropdown Content */}
+                  <div className="p-6 max-h-[60vh] overflow-y-auto" onScroll={(e) => e.stopPropagation()}>
+                    <div className="grid gap-6 grid-cols-2">
+                      {secondaryMenuItems.map((item) => (
+                        <div key={item.name} className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full"></div>
+                            <Link
+                              href={item.href}
+                              className="font-semibold text-[var(--color-text-primary)] text-base hover:text-[var(--color-primary)] transition-colors"
+                              onClick={() => setActiveDropdown(null)}
+                            >
+                              {item.name}
+                            </Link>
+                          </div>
+                          {item.dropdown && (
+                            <div className="pl-4">
+                              {item.dropdown.sections.map((section) => (
+                                <div key={section.title} className="mb-3">
+                                  <h4 className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+                                    {section.title}
+                                  </h4>
+                                  <ul className="space-y-1">
+                                    {section.links.slice(0, 3).map((link) => (
+                                      <li key={link.name}>
+                                        <Link
+                                          href={link.href}
+                                          className="group/link flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all duration-200 py-1 px-2 rounded hover:bg-[var(--color-neutral-100)]"
+                                          onClick={(e) => {
+                                            if (!handleAnchorClick(link.href)) {
+                                              e.preventDefault()
+                                            }
+                                          }}
+                                        >
+                                          <svg 
+                                            className="w-2.5 h-2.5 opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                          >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                          </svg>
+                                          {link.name}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                    {section.links.length > 3 && (
+                                      <li>
+                                        <Link
+                                          href={item.href}
+                                          className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] font-medium transition-colors ml-2"
+                                          onClick={() => setActiveDropdown(null)}
+                                        >
+                                          View all {section.title.toLowerCase()} →
+                                        </Link>
+                                      </li>
+                                    )}
+                                  </ul>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Dropdown Footer */}
+                    <div className="mt-6 pt-4 border-t border-[var(--color-border-light)]">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-[var(--color-text-muted)]">
+                          Need help? Contact our team
+                        </p>
+                        <Link
+                          href="/contact"
+                          className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          Get Support →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right side items */}
           <div className="flex items-center gap-2">
-            {/* CTA Button */}
+            {/* CTA Button - Hidden on mobile, visible on lg+ */}
             <div className="hidden lg:flex">
               <Link 
-                href="/contact/assessment" 
-                className="relative group inline-flex items-center gap-1.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-4 py-2 rounded-md hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-sm"
+                href="/contact" 
+                className="relative group inline-flex items-center gap-1.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-3 lg:px-4 py-2 rounded-md hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-xs lg:text-sm"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -607,11 +775,12 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Enhanced Mobile menu button with animations */}
+            {/* Enhanced Mobile menu button with animations - Mobile and Tablet */}
             <button
-              className="lg:hidden relative p-2 rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)] transition-all duration-200 group overflow-hidden"
+              className="lg:hidden relative p-2 rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)] transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
+              aria-expanded={isMenuOpen}
             >
               {/* Button background hover effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/10 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-xl" />
@@ -647,7 +816,7 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation with Animations */}
+        {/* Mobile Navigation with Animations - Mobile and Tablet */}
         <div 
           className={`lg:hidden fixed left-0 right-0 bg-white shadow-xl transition-all duration-300 ease-out overflow-hidden ${
             isMenuOpen 
@@ -657,7 +826,7 @@ export default function Header() {
           style={{ 
             top: `${headerHeight}px`, 
             zIndex: 999999,
-            maxHeight: isMenuOpen ? '80vh' : '0'
+            maxHeight: isMenuOpen ? 'calc(100vh - 80px)' : '0'
           }}
         >
           {/* Backdrop overlay with fade animation */}
@@ -671,8 +840,8 @@ export default function Header() {
           
           {/* Menu content with staggered animations */}
           <div className="relative bg-white border-t border-[var(--color-border-light)]">
-            <div className="max-h-[75vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {menuItems.map((item, index) => (
+            <div className="max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+              {allMenuItems.map((item, index) => (
                 <div 
                   key={item.name}
                   className={`transform transition-all duration-300 ease-out ${
@@ -686,7 +855,7 @@ export default function Header() {
                 >
                   <Link 
                     href={item.href}
-                    className={`group flex items-center justify-between transition-all duration-200 font-medium py-4 px-6 border-b border-[var(--color-border-light)] relative overflow-hidden ${
+                    className={`group flex items-center justify-between transition-all duration-200 font-medium py-4 px-4 sm:px-6 border-b border-[var(--color-border-light)] relative overflow-hidden ${
                       isMenuItemActive(item)
                         ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold'
                         : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
@@ -727,7 +896,7 @@ export default function Header() {
                       {item.dropdown.sections.map((section, sectionIndex) => (
                         <div 
                           key={section.title} 
-                          className={`px-6 py-3 transform transition-all duration-300 ${
+                          className={`px-4 sm:px-6 py-3 transform transition-all duration-300 ${
                             isMenuOpen 
                               ? 'translate-y-0 opacity-100' 
                               : 'translate-y-4 opacity-0'
@@ -794,17 +963,17 @@ export default function Header() {
               
               {/* Enhanced CTA section with animation */}
               <div 
-                className={`p-6 border-t border-[var(--color-border-light)] bg-gradient-to-r from-[var(--color-neutral)] to-white transform transition-all duration-400 ease-out ${
+                className={`p-4 sm:p-6 border-t border-[var(--color-border-light)] bg-gradient-to-r from-[var(--color-neutral)] to-white transform transition-all duration-400 ease-out ${
                   isMenuOpen 
                     ? 'translate-y-0 opacity-100' 
                     : 'translate-y-8 opacity-0'
                 }`}
                 style={{ 
-                  transitionDelay: isMenuOpen ? `${menuItems.length * 50 + 100}ms` : '0ms' 
+                  transitionDelay: isMenuOpen ? `${allMenuItems.length * 50 + 100}ms` : '0ms' 
                 }}
               >
                 <Link 
-                  href="/contact/assessment" 
+                  href="/contact" 
                   className="group relative flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-6 py-4 rounded-xl hover:shadow-xl transition-all duration-300 font-semibold text-base overflow-hidden transform hover:scale-105"
                   onClick={closeMenu}
                 >
@@ -833,7 +1002,7 @@ export default function Header() {
                     isMenuOpen ? 'opacity-100' : 'opacity-0'
                   }`}
                   style={{ 
-                    transitionDelay: isMenuOpen ? `${menuItems.length * 50 + 200}ms` : '0ms' 
+                    transitionDelay: isMenuOpen ? `${allMenuItems.length * 50 + 200}ms` : '0ms' 
                   }}
                 >
                   🚀 No commitment • Expert consultation • Quick response
