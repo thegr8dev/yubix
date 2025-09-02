@@ -1,12 +1,37 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
+import React, { useState, useEffect, useRef } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { 
+  ChevronDownIcon,
+  HomeIcon,
+  UserGroupIcon,
+  CogIcon,
+  RocketLaunchIcon,
+  PhoneIcon,
+  GlobeAltIcon,
+  BuildingOfficeIcon,
+  ShieldCheckIcon,
+  BriefcaseIcon,
+  ChartBarIcon,
+  DocumentTextIcon,
+  InformationCircleIcon,
+  EyeIcon,
+  AcademicCapIcon,
+  ClockIcon,
+  ExclamationTriangleIcon,
+  BeakerIcon,
+  CpuChipIcon,
+  MagnifyingGlassIcon,
+  PresentationChartLineIcon
+} from '@heroicons/react/24/outline'
 
 interface MenuDropdownLink {
   name: string;
   href: string;
+  description?: string;
+  icon?: React.ElementType;
 }
 
 interface MenuDropdownSection {
@@ -21,278 +46,115 @@ interface MenuDropdown {
 interface MenuItem {
   name: string;
   href: string;
+  description?: string;
+  icon?: React.ElementType;
   dropdown?: MenuDropdown | null;
 }
 
 export default function Header() {
+  const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null)
-  const [headerHeight, setHeaderHeight] = useState(64)
-  const [lastScrollY, setLastScrollY] = useState(0)
-  const [isDropdownHovered, setIsDropdownHovered] = useState(false)
-  const headerRef = useRef<HTMLElement>(null)
-  const menuItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null)
   const pathname = usePathname()
+  const router = useRouter()
+  const headerRef = useRef<HTMLElement>(null)
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Close menu when pathname changes
+  useEffect(() => {
+    setIsMenuOpen(false)
+    setActiveDropdown(null)
+    setShowMoreMenu(false)
+    setExpandedMobileMenu(null)
+  }, [pathname])
+
+  // Force clear mobile menu after navigation
+  useEffect(() => {
+    if (pathname) {
+      // Extra safety to ensure mobile menu is closed after any navigation
+      const timer = setTimeout(() => {
+        setIsMenuOpen(false)
+        setExpandedMobileMenu(null)
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [pathname])
+
+  // Handle click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null)
+        setShowMoreMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Function to check if a menu item is active
   const isMenuItemActive = (item: MenuItem) => {
-    // Direct path match
-    if (pathname === item.href) {
-      return true
-    }
+    if (item.href === '/' && pathname === '/') return true
+    if (item.href !== '/' && pathname.startsWith(item.href)) return true
     
-    // Check dropdown links for active state
+    // Check if any dropdown link is active
     if (item.dropdown) {
-      for (const section of item.dropdown.sections) {
-        for (const link of section.links) {
-          // Extract the base path from the link (remove anchor)
-          const linkPath = link.href.split('#')[0]
-          
-          // Special handling: Only consider dropdown link matches if this menu item
-          // is the primary owner of that path (i.e., its main href matches the linkPath)
-          if (linkPath && pathname === linkPath && item.href === linkPath) {
-            return true
-          }
-        }
-      }
+      return item.dropdown.sections.some(section =>
+        section.links.some(link => 
+          link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+        )
+      )
     }
     
     return false
   }
 
-  // Function to check if any secondary menu item is active (for "More" button)
-  const isSecondaryMenuActive = () => {
-    return secondaryMenuItems.some(item => isMenuItemActive(item))
+  const toggleMobileSubmenu = (itemName: string) => {
+    setExpandedMobileMenu(prev => prev === itemName ? null : itemName)
   }
-
-  // Function to check if a specific dropdown link is active
-  const isDropdownLinkActive = (linkHref: string) => {
-    if (linkHref.includes('#')) {
-      const linkPath = linkHref.split('#')[0]
-      return pathname === linkPath
-    }
-    return pathname === linkHref
-  }
-
-  const closeMenu = () => {
-    setIsMenuOpen(false)
-    setActiveDropdown(null)
-  }
-
-  // Handle smooth scrolling with header offset
-  const handleAnchorClick = (href: string) => {
-    // Close dropdown/menu first
-    setActiveDropdown(null)
-    setIsMenuOpen(false)
-    
-    // If it's an anchor link to the current page or another page
-    if (href.includes('#')) {
-      const [path, hash] = href.split('#')
-      const isCurrentPage = path === '' || path === window.location.pathname
-      
-      if (isCurrentPage) {
-        // Same page - smooth scroll to element
-        setTimeout(() => {
-          const element = document.getElementById(hash)
-          if (element) {
-            const headerOffset = headerHeight + 20 // Add some padding
-            const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-            const offsetPosition = elementPosition - headerOffset
-            
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth'
-            })
-          }
-        }, 100)
-        return false // Prevent default navigation
-      }
-    }
-    return true // Allow default navigation
-  }
-
-  const handleMouseEnter = (itemName: string) => {
-    // Clear any existing timeout immediately
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout)
-      setHoverTimeout(null)
-    }
-    // Always set the dropdown, even if it doesn't have one (will show nothing)
-    setActiveDropdown(itemName)
-  }
-
-  const handleMouseLeave = () => {
-    // Shorter delay for better UX
-    const timeout = setTimeout(() => {
-      setActiveDropdown(null)
-    }, 150)
-    setHoverTimeout(timeout)
-  }
-
-  const handleDropdownMouseEnter = () => {
-    // Clear timeout immediately when entering dropdown
-    if (hoverTimeout) {
-      clearTimeout(hoverTimeout)
-      setHoverTimeout(null)
-    }
-    setIsDropdownHovered(true)
-  }
-
-  const handleDropdownMouseLeave = () => {
-    setIsDropdownHovered(false)
-    // Shorter delay for dropdown as well
-    const timeout = setTimeout(() => {
-      setActiveDropdown(null)
-    }, 150)
-    setHoverTimeout(timeout)
-  }
-
-  // Handle scroll to auto-hide dropdowns
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      
-      // Only close dropdown when scrolling the main page and user is not hovering over dropdown
-      if (activeDropdown && !isDropdownHovered && Math.abs(currentScrollY - lastScrollY) > 20) {
-        setActiveDropdown(null)
-      }
-      
-      // Close mobile menu when scrolling
-      if (isMenuOpen && Math.abs(currentScrollY - lastScrollY) > 10) {
-        setIsMenuOpen(false)
-      }
-      
-      setLastScrollY(currentScrollY)
-    }
-
-    // Add scroll event listener
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [activeDropdown, isMenuOpen, lastScrollY, isDropdownHovered])
-
-  // Clear dropdown state when pathname changes
-  useEffect(() => {
-    setActiveDropdown(null)
-    setIsMenuOpen(false)
-  }, [pathname])
-
-  // Handle hash navigation on page load
-  useEffect(() => {
-    const hash = window.location.hash.slice(1)
-    if (hash) {
-      setTimeout(() => {
-        const element = document.getElementById(hash)
-        if (element) {
-          const headerOffset = headerHeight + 20
-          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-          const offsetPosition = elementPosition - headerOffset
-          
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          })
-        }
-      }, 500) // Wait for page to fully load
-    }
-  }, [headerHeight])
-
-  // Handle click outside and escape key
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
-        setActiveDropdown(null)
-        setIsMenuOpen(false)
-      }
-    }
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setActiveDropdown(null)
-        setIsMenuOpen(false)
-      }
-    }
-
-    // Add event listeners
-    document.addEventListener('mousedown', handleClickOutside)
-    document.addEventListener('keydown', handleEscapeKey)
-    
-    // Cleanup
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-      document.removeEventListener('keydown', handleEscapeKey)
-    }
-  }, [])
-
-  // Clear timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout)
-      }
-    }
-  }, [hoverTimeout])
-
-  useEffect(() => {
-    if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight)
-    }
-  }, [])
-
-  const getDropdownPosition = useCallback((itemName: string, isLastTwo: boolean) => {
-    const itemRef = menuItemRefs.current[itemName]
-    if (!itemRef) return { left: '50%', transform: 'translateX(-50%)' }
-    
-    const rect = itemRef.getBoundingClientRect()
-    
-    // Special handling for "More" button - always align to the right with proper spacing
-    if (itemName === 'More') {
-      return { right: '20px' }
-    }
-    
-    if (isLastTwo) {
-      return { right: window.innerWidth - rect.right + 'px' }
-    } else {
-      return { left: rect.left + rect.width / 2 + 'px', transform: 'translateX(-50%)' }
-    }
-  }, [])
-
-  const setMenuItemRef = useCallback((itemName: string) => (el: HTMLDivElement | null) => {
-    menuItemRefs.current[itemName] = el
-  }, [])
 
   // Primary navigation items (always visible on desktop)
   const primaryMenuItems = [
     {
       name: 'Home',
       href: '/',
+      description: 'Welcome to YUBIX',
+      icon: HomeIcon,
       dropdown: null
     },
     {
       name: 'About',
       href: '/about',
+      description: 'Learn about our company',
+      icon: UserGroupIcon,
       dropdown: {
         sections: [
           {
             title: 'Company',
             links: [
-              { name: 'About Us', href: '/about' },
-              { name: 'Mission & Vision', href: '/about#mission' },
-              { name: 'Leadership Team', href: '/about#leadership' },
-              { name: 'Company Timeline', href: '/about#timeline' }
+              { name: 'About Us', href: '/about', description: 'Our story and mission', icon: InformationCircleIcon },
+              { name: 'Mission & Vision', href: '/about#mission', description: 'Our core values', icon: EyeIcon },
+              { name: 'Leadership Team', href: '/about#leadership', description: 'Meet our executives', icon: UserGroupIcon },
+              { name: 'Company Timeline', href: '/about#timeline', description: 'Our journey so far', icon: ClockIcon }
             ]
           },
           {
             title: 'Trust & Security',
             links: [
-              { name: 'ISO Certifications', href: '/about#certifications' },
-              { name: 'Our Values', href: '/about#mission' },
-              { name: 'Global Presence', href: '/about#certifications' },
-              { name: 'Contact Us', href: '/contact' }
+              { name: 'ISO Certifications', href: '/about#certifications', description: 'Industry standards', icon: DocumentTextIcon },
+              { name: 'Our Values', href: '/about#mission', description: 'What drives us', icon: ShieldCheckIcon },
+              { name: 'Global Presence', href: '/about#certifications', description: 'Worldwide reach', icon: GlobeAltIcon },
+              { name: 'Contact Us', href: '/contact', description: 'Get in touch', icon: PhoneIcon }
             ]
           }
         ]
@@ -301,49 +163,54 @@ export default function Header() {
     {
       name: 'Services',
       href: '/services',
+      description: 'Professional security services',
+      icon: CogIcon,
       dropdown: {
         sections: [
           {
             title: 'Our Services',
             links: [
-              { name: 'Security Advisory', href: '/services#security-advisory' },
-              { name: 'Custom Development', href: '/services#custom-development' },
-              { name: 'AI Integration', href: '/services#ai-integration' },
-              { name: 'Training & Simulations', href: '/services#simulations-drills' },
-              { name: 'All Services', href: '/services#services' }
+              { name: 'Cybersecurity Solutions', href: '/services', description: 'Comprehensive security', icon: ShieldCheckIcon },
+              { name: 'Risk Assessment', href: '/services#risk-assessment', description: 'Evaluate your risks', icon: ExclamationTriangleIcon },
+              { name: 'Compliance Management', href: '/services#compliance', description: 'Meet regulations', icon: DocumentTextIcon },
+              { name: 'Security Training', href: '/services#training', description: 'Educate your team', icon: AcademicCapIcon }
             ]
           },
           {
-            title: 'Resources',
+            title: 'Support & Maintenance',
             links: [
-              { name: 'Service Packages', href: '/services#packages' },
-              { name: 'Case Studies', href: '/services#case-studies' },
-              { name: 'Get Quote', href: '/contact' },
-              { name: 'Schedule Demo', href: '/contact' }
+              { name: '24/7 Support', href: '/services#support', description: 'Round-the-clock help', icon: ClockIcon },
+              { name: 'Managed Services', href: '/services#managed', description: 'Outsourced security', icon: CogIcon },
+              { name: 'Emergency Response', href: '/services#emergency', description: 'Incident management', icon: ExclamationTriangleIcon },
+              { name: 'System Updates', href: '/services#updates', description: 'Keep systems current', icon: CpuChipIcon }
             ]
           }
         ]
       }
     },
     {
-      name: 'Ops Room',
-      href: '/ops-room',
-      dropdown: null
-    },
-    {
-      name: 'Industries',
-      href: '/industries',
+      name: 'Innovation',
+      href: '/innovation',
+      description: 'Cutting-edge technology',
+      icon: RocketLaunchIcon,
       dropdown: {
         sections: [
           {
-            title: 'Sectors We Serve',
+            title: 'Research & Development',
             links: [
-              { name: 'Aviation', href: '/industries#aviation' },
-              { name: 'Corporate', href: '/industries#corporate' },
-              { name: 'Government', href: '/industries#government' },
-              { name: 'Healthcare', href: '/industries#healthcare' },
-              { name: 'Education', href: '/industries#education' },
-              { name: 'Hospitality', href: '/industries#hospitality' }
+              { name: 'AI Research', href: '/innovation#ai-research', description: 'Artificial intelligence', icon: CpuChipIcon },
+              { name: 'Emerging Threats', href: '/innovation#emerging-threats', description: 'Future security risks', icon: ExclamationTriangleIcon },
+              { name: 'Future Technologies', href: '/innovation#future-tech', description: 'Next-gen solutions', icon: RocketLaunchIcon },
+              { name: 'Research Papers', href: '/innovation#research-papers', description: 'Published research', icon: DocumentTextIcon }
+            ]
+          },
+          {
+            title: 'Experimental Solutions',
+            links: [
+              { name: 'Beta Programs', href: '/innovation#beta-programs', description: 'Early access testing', icon: BeakerIcon },
+              { name: 'Proof of Concepts', href: '/innovation#proof-of-concepts', description: 'Prototype solutions', icon: PresentationChartLineIcon },
+              { name: 'Tech Previews', href: '/innovation#tech-previews', description: 'Coming soon features', icon: EyeIcon },
+              { name: 'Innovation Lab', href: '/innovation#innovation-lab', description: 'R&D facility', icon: BuildingOfficeIcon }
             ]
           }
         ]
@@ -352,24 +219,25 @@ export default function Header() {
     {
       name: 'Contact',
       href: '/contact',
+      description: 'Get in touch with us',
+      icon: PhoneIcon,
       dropdown: {
         sections: [
           {
             title: 'Get in Touch',
             links: [
-              { name: 'Contact Form', href: '/contact#contact-form' },
-              { name: 'Office Locations', href: '/contact#locations' },
-              { name: 'Phone & Email', href: '/contact#direct' },
-              { name: 'Sales Inquiry', href: '/contact#sales' }
+              { name: 'General Inquiry', href: '/contact', description: 'Ask us anything', icon: InformationCircleIcon },
+              { name: 'Phone & Email', href: '/contact#direct', description: 'Direct contact', icon: PhoneIcon },
+              { name: 'Sales Inquiry', href: '/contact#sales', description: 'Purchase information', icon: ChartBarIcon }
             ]
           },
           {
             title: 'Book Consultation',
             links: [
-              { name: 'Free Assessment', href: '/contact#assessment' },
-              { name: 'Demo Request', href: '/contact#demo' },
-              { name: 'Custom Solution', href: '/contact#custom' },
-              { name: 'Enterprise Meeting', href: '/contact#enterprise' }
+              { name: 'Free Assessment', href: '/contact#assessment', description: 'Security evaluation', icon: MagnifyingGlassIcon },
+              { name: 'Demo Request', href: '/contact#demo', description: 'See our solutions', icon: PresentationChartLineIcon },
+              { name: 'Custom Solution', href: '/contact#custom', description: 'Tailored approach', icon: CogIcon },
+              { name: 'Enterprise Meeting', href: '/contact#enterprise', description: 'Large-scale solutions', icon: BuildingOfficeIcon }
             ]
           }
         ]
@@ -382,42 +250,18 @@ export default function Header() {
     {
       name: 'Ecosystem',
       href: '/ecosystem',
+      description: 'Partner network',
+      icon: GlobeAltIcon,
       dropdown: {
         sections: [
           {
             title: 'Platforms',
             links: [
-              { name: 'Vertex Pro', href: '#' },
-              { name: 'Buzz World', href: '#' },
-              { name: 'BYONN', href: '#' },
-              { name: 'Fortalyx', href: '#' },
-              { name: 'Security Hub', href: '#' }
-            ]
-          }
-        ]
-      }
-    },
-    {
-      name: 'Innovation',
-      href: '/innovation',
-      dropdown: {
-        sections: [
-          {
-            title: 'Research & Development',
-            links: [
-              { name: 'AI Research', href: '/innovation#ai-research' },
-              { name: 'Emerging Threats', href: '/innovation#emerging-threats' },
-              { name: 'Future Technologies', href: '/innovation#future-tech' },
-              { name: 'Research Papers', href: '/innovation#research-papers' }
-            ]
-          },
-          {
-            title: 'Experimental Solutions',
-            links: [
-              { name: 'Beta Programs', href: '/innovation#beta-programs' },
-              { name: 'Proof of Concepts', href: '/innovation#proof-of-concepts' },
-              { name: 'Innovation Partners', href: '/innovation#innovation-partners' },
-              { name: 'Developer APIs', href: '/innovation#developer-apis' }
+              { name: 'Vertex Pro', href: '#', description: 'Advanced security platform', icon: ShieldCheckIcon },
+              { name: 'Buzz World', href: '#', description: 'Communication hub', icon: GlobeAltIcon },
+              { name: 'BYONN', href: '#', description: 'Network solutions', icon: CpuChipIcon },
+              { name: 'Fortalyx', href: '#', description: 'Defense systems', icon: ExclamationTriangleIcon },
+              { name: 'Security Hub', href: '#', description: 'Centralized control', icon: CogIcon }
             ]
           }
         ]
@@ -426,50 +270,60 @@ export default function Header() {
     {
       name: 'Operations',
       href: '/operations',
-      dropdown: {
-        sections: [
-          {
-            title: 'Crisis Response',
-            links: [
-              { name: '24/7 SOC', href: '/operations#soc' },
-              { name: 'Incident Response', href: '/operations#incident' },
-              { name: 'Emergency Support', href: '/operations#emergency' },
-              { name: 'Threat Intelligence', href: '/operations#intelligence' }
-            ]
-          },
-          {
-            title: 'Real-time Support',
-            links: [
-              { name: 'Live Monitoring', href: '/operations#monitoring' },
-              { name: 'Rapid Response', href: '/operations#response' },
-              { name: 'Status Dashboard', href: '/operations#status' },
-              { name: 'Contact Operations', href: '/operations#contact-operations' }
-            ]
-          }
-        ]
-      }
+      description: 'Operational excellence',
+      icon: CogIcon,
+      dropdown: null
+    },
+    {
+      name: 'Industries',
+      href: '/industries',
+      description: 'Industry solutions',
+      icon: BuildingOfficeIcon,
+      dropdown: null
+    },
+    {
+      name: 'Products',
+      href: '/products',
+      description: 'Our product lineup',
+      icon: ShieldCheckIcon,
+      dropdown: null
+    },
+    {
+      name: 'Resilience',
+      href: '/resilience',
+      description: 'Business continuity',
+      icon: ShieldCheckIcon,
+      dropdown: null
+    },
+    {
+      name: 'Investors',
+      href: '/investors',
+      description: 'Investor relations',
+      icon: ChartBarIcon,
+      dropdown: null
+    },
+    {
+      name: 'Careers',
+      href: '/careers',
+      description: 'Join our team',
+      icon: BriefcaseIcon,
+      dropdown: null
     },
     {
       name: 'Certifications',
       href: '/certifications',
+      description: 'Industry certifications',
+      icon: DocumentTextIcon,
       dropdown: {
         sections: [
           {
-            title: 'Certifications',
+            title: 'Our Certifications',
             links: [
-              { name: 'ISO 27001', href: '/certifications#iso-27001' },
-              { name: 'SOC 2 Type II', href: '/certifications#soc2' },
-              { name: 'GDPR Compliance', href: '/certifications#gdpr' },
-              { name: 'Industry Standards', href: '/certifications#standards' }
-            ]
-          },
-          {
-            title: 'Funding & Grants',
-            links: [
-              { name: 'Grant Opportunities', href: '/certifications#grants' },
-              { name: 'Funding Programs', href: '/certifications#funding' },
-              { name: 'Partnership Benefits', href: '/certifications#benefits' },
-              { name: 'Application Process', href: '/certifications#application' }
+              { name: 'ISO 27001', href: '/certifications#iso27001', description: 'Information security standard', icon: DocumentTextIcon },
+              { name: 'SOC 2 Type II', href: '/certifications#soc2', description: 'Service organization controls', icon: ShieldCheckIcon },
+              { name: 'Industry Standards', href: '/certifications#standards', description: 'Compliance frameworks', icon: ChartBarIcon },
+              { name: 'Partnership Benefits', href: '/certifications#benefits', description: 'Partner advantages', icon: UserGroupIcon },
+              { name: 'Application Process', href: '/certifications#application', description: 'How to apply', icon: InformationCircleIcon }
             ]
           }
         ]
@@ -477,541 +331,394 @@ export default function Header() {
     }
   ]
 
-  // All menu items combined (for mobile)
-  const allMenuItems = [...primaryMenuItems, ...secondaryMenuItems]
-
   return (
-    <header ref={headerRef} className="bg-white shadow-md sticky top-0 z-[99999] overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 min-w-0">
-        <div className="flex items-center justify-between py-3 md:py-4">
+    <header ref={headerRef} className="relative">
+      <nav 
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200/50' 
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="text-lg sm:text-xl font-bold text-[var(--color-secondary)] hover:text-[var(--color-primary)] transition-colors">
-              YUBIX
+          <div className="flex justify-between items-center py-4">
+            <Link href="/" className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">Y</span>
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                YUBIX
+              </span>
             </Link>
-          </div>
-          
-          {/* Desktop Navigation - Hidden on mobile and tablet, shown on lg+ */}
-          <nav className="hidden lg:flex items-center space-x-0.5 flex-1 justify-center max-w-4xl mx-auto">
-            {/* Primary Menu Items */}
-            {primaryMenuItems.map((item, index) => {
-              // Calculate positioning for the dropdown
-              const isLastTwoItems = index >= primaryMenuItems.length - 2
-              const dropdownPosition = getDropdownPosition(item.name, isLastTwoItems)
-              
-              return (
-                <div
-                  key={item.name}
-                  className="relative"
-                  ref={setMenuItemRef(item.name)}
-                  onMouseEnter={() => handleMouseEnter(item.name)}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <Link
-                    href={item.href}
-                    className={`
-                      px-3 py-2 transition-all duration-200 font-medium rounded-md 
-                      flex items-center gap-1 whitespace-nowrap text-sm
-                      ${isMenuItemActive(item) 
-                        ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold' 
-                        : activeDropdown === item.name 
-                          ? 'text-[var(--color-primary)] bg-[var(--color-neutral-100)]'
-                          : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-8">
+              {/* Primary Menu Items */}
+              {primaryMenuItems.map((item, index) => (
+                <div key={item.name} className="relative">
+                  <button
+                    onClick={() => {
+                      if (item.dropdown) {
+                        setActiveDropdown(activeDropdown === item.name ? null : item.name)
+                        setShowMoreMenu(false)
+                      } else {
+                        window.location.href = item.href
                       }
-                    `}
+                    }}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      isMenuItemActive(item)
+                        ? 'text-blue-600 bg-blue-50'
+                        : `${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-gray-700 hover:text-blue-600'} hover:bg-gray-50`
+                    }`}
                   >
-                    {item.name}
-                    {item.dropdown && (
-                      <svg 
-                        className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === item.name ? 'rotate-180' : ''}`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
+                    {item.icon && (
+                      <div className={`w-5 h-5 rounded-md flex items-center justify-center ${
+                        isMenuItemActive(item)
+                          ? 'bg-blue-100'
+                          : 'bg-gray-100'
+                      }`}>
+                        {React.createElement(item.icon, { className: "w-3 h-3" })}
+                      </div>
                     )}
-                  </Link>
+                    <span>{item.name}</span>
+                    {item.dropdown && (
+                      <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${
+                        activeDropdown === item.name ? 'rotate-180' : ''
+                      }`} />
+                    )}
+                  </button>
 
                   {/* Mega Menu Dropdown */}
                   {item.dropdown && activeDropdown === item.name && (
-                    <div 
-                      data-dropdown="mega-menu"
-                      className={`fixed ${item.dropdown.sections.length > 1 ? 'w-[560px]' : 'w-[320px]'} bg-white border border-[var(--color-border-light)] rounded-xl shadow-2xl overflow-hidden`}
-                      style={{ 
-                        top: `${headerHeight + 8}px`,
-                        zIndex: 999999,
-                        ...dropdownPosition
-                      }}
-                      onMouseEnter={handleDropdownMouseEnter}
-                      onMouseLeave={handleDropdownMouseLeave}
-                    >
-                      {/* Dropdown Header */}
-                      <div className="bg-gradient-to-r from-[var(--color-neutral)] to-[var(--color-neutral-100)] px-6 py-4 border-b border-[var(--color-border-light)]">
-                        <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-                          {item.name}
-                        </h2>
-                        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                          Explore our {item.name.toLowerCase()} offerings
-                        </p>
-                      </div>
-                      
-                      {/* Dropdown Content */}
-                      <div className="p-6">
-                        <div className={`grid gap-6 ${item.dropdown.sections.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                    <div className={`absolute top-full mt-2 w-[600px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 ${
+                      index >= primaryMenuItems.length - 2 
+                        ? 'right-0' 
+                        : 'left-1/2 transform -translate-x-1/2'
+                    }`}>
+                      <div className="p-8">
+                        {/* Header */}
+                        <div className="mb-6">
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">{item.name}</h3>
+                          <p className="text-gray-600">{item.description}</p>
+                        </div>
+                        
+                        {/* Sections */}
+                        <div className="grid grid-cols-2 gap-8">
                           {item.dropdown.sections.map((section) => (
-                            <div key={section.title} className="space-y-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full"></div>
-                                <h3 className="font-semibold text-[var(--color-text-primary)] text-sm uppercase tracking-wider">
-                                  {section.title}
-                                </h3>
-                              </div>
-                              <ul className="space-y-2 pl-4">
+                            <div key={section.title}>
+                              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
+                                {section.title}
+                              </h4>
+                              <div className="space-y-3">
                                 {section.links.map((link) => (
-                                  <li key={link.name}>
-                                    <Link
-                                      href={link.href}
-                                      className="group/link flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all duration-200 py-2 px-3 rounded-lg hover:bg-[var(--color-neutral-100)]"
-                                      onClick={(e) => {
-                                        if (!handleAnchorClick(link.href)) {
-                                          e.preventDefault()
-                                        }
-                                      }}
-                                    >
-                                      <svg 
-                                        className="w-3 h-3 opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                      </svg>
-                                      <span className="text-sm font-medium">{link.name}</span>
-                                    </Link>
-                                  </li>
+                                  <Link
+                                    key={link.name}
+                                    href={link.href}
+                                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 group"
+                                    onClick={() => setActiveDropdown(null)}
+                                  >
+                                    <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                                      'bg-gray-100'
+                                    }`}>
+                                      {link.icon && React.createElement(link.icon, { className: "w-4 h-4" })}
+                                    </span>
+                                    <div>
+                                      <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
+                                        {link.name}
+                                      </div>
+                                      {link.description && (
+                                        <div className="text-sm text-gray-500">{link.description}</div>
+                                      )}
+                                    </div>
+                                  </Link>
                                 ))}
-                              </ul>
+                              </div>
                             </div>
                           ))}
                         </div>
-                        
-                        {/* Dropdown Footer */}
-                        <div className="mt-6 pt-4 border-t border-[var(--color-border-light)]">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs text-[var(--color-text-muted)]">
-                              Need help? Contact our team
-                            </p>
-                            <Link
-                              href="/contact"
-                              className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              Get Support →
-                            </Link>
-                          </div>
-                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-
-            {/* More Menu Button - Desktop Hamburger */}
-            <div 
-              className="relative"
-              ref={setMenuItemRef('More')}
-              onMouseEnter={() => handleMouseEnter('More')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button
-                className={`
-                  px-3 py-2 transition-all duration-200 font-medium rounded-md 
-                  flex items-center gap-1 whitespace-nowrap text-sm
-                  ${isSecondaryMenuActive() 
-                    ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold' 
-                    : activeDropdown === 'More' 
-                      ? 'text-[var(--color-primary)] bg-[var(--color-neutral-100)]'
-                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
-                  }
-                `}
-              >
-                More
-                <svg 
-                  className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'More' ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {/* More Menu Dropdown */}
-              {activeDropdown === 'More' && (
-                <div 
-                  data-dropdown="more-menu"
-                  className="fixed w-[640px] bg-white border border-[var(--color-border-light)] rounded-xl shadow-2xl overflow-hidden"
-                  style={{ 
-                    top: `${headerHeight + 8}px`,
-                    zIndex: 999999,
-                    maxWidth: 'calc(100vw - 40px)',
-                    ...getDropdownPosition('More', true)
-                  }}
-                  onMouseEnter={handleDropdownMouseEnter}
-                  onMouseLeave={handleDropdownMouseLeave}
-                >
-                  {/* Dropdown Header */}
-                  <div className="bg-gradient-to-r from-[var(--color-neutral)] to-[var(--color-neutral-100)] px-6 py-4 border-b border-[var(--color-border-light)]">
-                    <h2 className="text-lg font-semibold text-[var(--color-text-primary)]">
-                      More Services
-                    </h2>
-                    <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-                      Explore additional offerings and specialized services
-                    </p>
-                  </div>
-                  
-                  {/* Dropdown Content */}
-                  <div className="p-6 max-h-[60vh] overflow-y-auto" onScroll={(e) => e.stopPropagation()}>
-                    <div className="grid gap-6 grid-cols-2">
-                      {secondaryMenuItems.map((item) => (
-                        <div key={item.name} className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full"></div>
-                            <Link
-                              href={item.href}
-                              className="font-semibold text-[var(--color-text-primary)] text-base hover:text-[var(--color-primary)] transition-colors"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              {item.name}
-                            </Link>
-                          </div>
-                          {item.dropdown && (
-                            <div className="pl-4">
-                              {item.dropdown.sections.map((section) => (
-                                <div key={section.title} className="mb-3">
-                                  <h4 className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
-                                    {section.title}
-                                  </h4>
-                                  <ul className="space-y-1">
-                                    {section.links.slice(0, 3).map((link) => (
-                                      <li key={link.name}>
-                                        <Link
-                                          href={link.href}
-                                          className="group/link flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all duration-200 py-1 px-2 rounded hover:bg-[var(--color-neutral-100)]"
-                                          onClick={(e) => {
-                                            if (!handleAnchorClick(link.href)) {
-                                              e.preventDefault()
-                                            }
-                                          }}
-                                        >
-                                          <svg 
-                                            className="w-2.5 h-2.5 opacity-0 group-hover/link:opacity-100 transition-opacity duration-200" 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            viewBox="0 0 24 24"
-                                          >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                          </svg>
-                                          {link.name}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                    {section.links.length > 3 && (
-                                      <li>
-                                        <Link
-                                          href={item.href}
-                                          className="text-xs text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] font-medium transition-colors ml-2"
-                                          onClick={() => setActiveDropdown(null)}
-                                        >
-                                          View all {section.title.toLowerCase()} →
-                                        </Link>
-                                      </li>
-                                    )}
-                                  </ul>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Dropdown Footer */}
-                    <div className="mt-6 pt-4 border-t border-[var(--color-border-light)]">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs text-[var(--color-text-muted)]">
-                          Need help? Contact our team
-                        </p>
-                        <Link
-                          href="/contact"
-                          className="text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors"
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          Get Support →
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </nav>
-
-          {/* Right side items */}
-          <div className="flex items-center gap-2">
-            {/* CTA Button - Hidden on mobile, visible on lg+ */}
-            <div className="hidden lg:flex">
-              <Link 
-                href="/contact" 
-                className="relative group inline-flex items-center gap-1.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-3 lg:px-4 py-2 rounded-md hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-xs lg:text-sm"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Get Assessment</span>
-                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity duration-200"></div>
-              </Link>
-            </div>
-
-            {/* Enhanced Mobile menu button with animations - Mobile and Tablet */}
-            <button
-              className="lg:hidden relative p-2 rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)] transition-all duration-200 group overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-              aria-expanded={isMenuOpen}
-            >
-              {/* Button background hover effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/10 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-xl" />
-              
-              {/* Animated hamburger/close icon */}
-              <div className="relative w-6 h-6 flex flex-col justify-center items-center">
-                <span 
-                  className={`block w-6 h-0.5 bg-current transition-all duration-300 ease-out ${
-                    isMenuOpen 
-                      ? 'rotate-45 translate-y-0.5' 
-                      : 'rotate-0 translate-y-0'
-                  }`}
-                />
-                <span 
-                  className={`block w-6 h-0.5 bg-current transition-all duration-300 ease-out my-1 ${
-                    isMenuOpen 
-                      ? 'opacity-0 scale-0' 
-                      : 'opacity-100 scale-100'
-                  }`}
-                />
-                <span 
-                  className={`block w-6 h-0.5 bg-current transition-all duration-300 ease-out ${
-                    isMenuOpen 
-                      ? '-rotate-45 -translate-y-0.5' 
-                      : 'rotate-0 translate-y-0'
-                  }`}
-                />
-              </div>
-              
-              {/* Ripple effect on click */}
-              <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-xl scale-0 group-active:scale-100 transition-transform duration-150" />
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation with Animations - Mobile and Tablet */}
-        <div 
-          className={`lg:hidden fixed left-0 right-0 bg-white shadow-xl transition-all duration-300 ease-out overflow-hidden ${
-            isMenuOpen 
-              ? 'opacity-100 visible transform translate-y-0' 
-              : 'opacity-0 invisible transform -translate-y-full'
-          }`}
-          style={{ 
-            top: `${headerHeight}px`, 
-            zIndex: 999999,
-            maxHeight: isMenuOpen ? 'calc(100vh - 80px)' : '0'
-          }}
-        >
-          {/* Backdrop overlay with fade animation */}
-          <div 
-            className={`fixed inset-0 bg-black transition-opacity duration-300 ${
-              isMenuOpen ? 'opacity-20' : 'opacity-0 pointer-events-none'
-            }`}
-            style={{ top: `${headerHeight}px` }}
-            onClick={closeMenu}
-          />
-          
-          {/* Menu content with staggered animations */}
-          <div className="relative bg-white border-t border-[var(--color-border-light)]">
-            <div className="max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {allMenuItems.map((item, index) => (
-                <div 
-                  key={item.name}
-                  className={`transform transition-all duration-300 ease-out ${
-                    isMenuOpen 
-                      ? 'translate-x-0 opacity-100' 
-                      : 'translate-x-full opacity-0'
-                  }`}
-                  style={{ 
-                    transitionDelay: isMenuOpen ? `${index * 50}ms` : '0ms' 
-                  }}
-                >
-                  <Link 
-                    href={item.href}
-                    className={`group flex items-center justify-between transition-all duration-200 font-medium py-4 px-4 sm:px-6 border-b border-[var(--color-border-light)] relative overflow-hidden ${
-                      isMenuItemActive(item)
-                        ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold'
-                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-[var(--color-neutral-100)]'
-                    }`}
-                    onClick={closeMenu}
-                  >
-                    {/* Hover effect background */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/5 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-                    
-                    <span className="relative text-base font-medium group-hover:translate-x-2 transition-transform duration-200">
-                      {item.name}
-                    </span>
-                    
-                    {item.dropdown && (
-                      <svg 
-                        className="w-4 h-4 group-hover:translate-x-1 group-hover:text-[var(--color-primary)] transition-all duration-200" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    )}
-                  </Link>
-                  
-                  {/* Mobile Submenu with enhanced animations */}
-                  {item.dropdown && (
-                    <div 
-                      className={`bg-gradient-to-r from-[var(--color-neutral)] to-[var(--color-neutral-100)] border-b border-[var(--color-border-light)] overflow-hidden transition-all duration-300 ${
-                        isMenuOpen 
-                          ? 'max-h-96 opacity-100' 
-                          : 'max-h-0 opacity-0'
-                      }`}
-                      style={{ 
-                        transitionDelay: isMenuOpen ? `${(index + 1) * 50}ms` : '0ms' 
-                      }}
-                    >
-                      {item.dropdown.sections.map((section, sectionIndex) => (
-                        <div 
-                          key={section.title} 
-                          className={`px-4 sm:px-6 py-3 transform transition-all duration-300 ${
-                            isMenuOpen 
-                              ? 'translate-y-0 opacity-100' 
-                              : 'translate-y-4 opacity-0'
-                          }`}
-                          style={{ 
-                            transitionDelay: isMenuOpen ? `${(index + sectionIndex + 2) * 30}ms` : '0ms' 
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className="w-2 h-2 bg-[var(--color-primary)] rounded-full animate-pulse" />
-                            <h4 className="font-semibold text-[var(--color-text-primary)] text-sm uppercase tracking-wide">
-                              {section.title}
-                            </h4>
-                          </div>
-                          
-                          <div className="space-y-1">
-                            {section.links.map((link, linkIndex) => (
-                              <Link
-                                key={link.name}
-                                href={link.href}
-                                className={`group/link block transition-all duration-200 py-2 px-4 rounded-md text-sm relative overflow-hidden transform ${
-                                  isMenuOpen 
-                                    ? 'translate-x-0 opacity-100' 
-                                    : 'translate-x-4 opacity-0'
-                                } ${
-                                  isDropdownLinkActive(link.href)
-                                    ? 'text-[var(--color-primary)] bg-[var(--color-primary)]/10 font-semibold'
-                                    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-white/80'
-                                }`}
-                                style={{ 
-                                  transitionDelay: isMenuOpen ? `${(index + sectionIndex + linkIndex + 3) * 20}ms` : '0ms' 
-                                }}
-                                onClick={(e) => {
-                                  if (!handleAnchorClick(link.href)) {
-                                    e.preventDefault()
-                                  }
-                                }}
-                              >
-                                {/* Link hover background */}
-                                <div className="absolute inset-0 bg-[var(--color-primary)]/5 scale-x-0 group-hover/link:scale-x-100 transition-transform duration-200 origin-left rounded-md" />
-                                
-                                <div className="relative flex items-center gap-2">
-                                  <svg 
-                                    className="w-3 h-3 opacity-0 group-hover/link:opacity-100 group-hover/link:translate-x-1 transition-all duration-200" 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                  </svg>
-                                  <span className="group-hover/link:translate-x-1 transition-transform duration-200">
-                                    {link.name}
-                                  </span>
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
                     </div>
                   )}
                 </div>
               ))}
-              
-              {/* Enhanced CTA section with animation */}
-              <div 
-                className={`p-4 sm:p-6 border-t border-[var(--color-border-light)] bg-gradient-to-r from-[var(--color-neutral)] to-white transform transition-all duration-400 ease-out ${
-                  isMenuOpen 
-                    ? 'translate-y-0 opacity-100' 
-                    : 'translate-y-8 opacity-0'
-                }`}
-                style={{ 
-                  transitionDelay: isMenuOpen ? `${allMenuItems.length * 50 + 100}ms` : '0ms' 
-                }}
-              >
-                <Link 
-                  href="/contact" 
-                  className="group relative flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-6 py-4 rounded-xl hover:shadow-xl transition-all duration-300 font-semibold text-base overflow-hidden transform hover:scale-105"
-                  onClick={closeMenu}
-                >
-                  {/* Button background animation */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-                  
-                  <svg 
-                    className="w-5 h-5 relative z-10 group-hover:rotate-12 transition-transform duration-300" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span className="relative z-10 group-hover:translate-x-1 transition-transform duration-200">
-                    Get Free Assessment
-                  </span>
-                  
-                  {/* Ripple effect on click */}
-                  <div className="absolute inset-0 bg-white/30 rounded-xl scale-0 group-active:scale-100 transition-transform duration-150" />
-                </Link>
-                
-                {/* Additional info with fade animation */}
-                <p 
-                  className={`text-center text-[var(--color-text-muted)] text-sm mt-3 transition-all duration-300 ${
-                    isMenuOpen ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  style={{ 
-                    transitionDelay: isMenuOpen ? `${allMenuItems.length * 50 + 200}ms` : '0ms' 
+
+              {/* More Button */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowMoreMenu(!showMoreMenu)
+                    setActiveDropdown(null)
                   }}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                    showMoreMenu
+                      ? 'text-blue-600 bg-blue-50'
+                      : `${isScrolled ? 'text-gray-700 hover:text-blue-600' : 'text-gray-700 hover:text-blue-600'} hover:bg-gray-50`
+                  }`}
                 >
-                  🚀 No commitment • Expert consultation • Quick response
-                </p>
+                  <span>More</span>
+                  <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${
+                    showMoreMenu ? 'rotate-180' : ''
+                  }`} />
+                </button>
+
+                {/* More Menu Dropdown */}
+                {showMoreMenu && (
+                  <div className="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 gap-1">
+                        {secondaryMenuItems.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={`flex items-center space-x-3 p-3 rounded-lg transition-colors duration-200 ${
+                              isMenuItemActive(item)
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setShowMoreMenu(false)}
+                          >
+                            <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                              isMenuItemActive(item)
+                                ? 'bg-blue-100'
+                                : 'bg-gray-100'
+                            }`}>
+                              {item.icon && React.createElement(item.icon, { className: "w-4 h-4" })}
+                            </span>
+                            <div>
+                              <div className="font-medium">{item.name}</div>
+                              {item.description && (
+                                <div className="text-sm text-gray-500">{item.description}</div>
+                              )}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile menu button */}
+            <button
+              className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Navigation Slider Drawer */}
+      <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
+        isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <span className="text-white font-bold text-lg">Y</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                YUBIX
+              </h2>
+              <p className="text-xs text-gray-500">Security Ecosystem</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setIsMenuOpen(false)
+              setExpandedMobileMenu(null)
+            }}
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Drawer Content */}
+        <div className="overflow-y-auto h-full pb-20">
+          <div className="p-4 space-y-2">
+            {/* Primary Menu Items */}
+            {primaryMenuItems.map((item) => (
+              <div key={item.name} className="space-y-1">
+                {/* Main Menu Item */}
+                <div className="flex items-center">
+                  <Link
+                    href={item.href}
+                    className={`flex items-center flex-1 px-4 py-3 rounded-xl transition-all duration-200 ${
+                      isMenuItemActive(item)
+                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setIsMenuOpen(false)
+                      setExpandedMobileMenu(null)
+                      setTimeout(() => {
+                        router.push(item.href)
+                      }, 150)
+                    }}
+                  >
+                    <div className="flex items-center flex-1">
+                      {item.icon && (
+                        <div className={`mr-4 w-8 h-8 rounded-lg flex items-center justify-center ${
+                          isMenuItemActive(item)
+                            ? 'bg-blue-100'
+                            : 'bg-gray-100'
+                        }`}>
+                          {React.createElement(item.icon, { className: "w-4 h-4" })}
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-semibold">{item.name}</div>
+                        {item.description && (
+                          <div className="text-sm text-gray-500">{item.description}</div>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                  {/* Dropdown Toggle Button */}
+                  {item.dropdown && (
+                    <button
+                      onClick={() => toggleMobileSubmenu(item.name)}
+                      className="ml-2 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                    >
+                      <ChevronDownIcon className={`w-5 h-5 transition-transform duration-200 ${
+                        expandedMobileMenu === item.name ? 'rotate-180' : ''
+                      }`} />
+                    </button>
+                  )}
+                </div>
+
+                {/* Collapsible Submenu */}
+                {item.dropdown && expandedMobileMenu === item.name && (
+                  <div className="ml-4 mt-2 space-y-1 overflow-hidden">
+                    {item.dropdown.sections.map((section) => (
+                      <div key={section.title} className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-900 mb-2 px-4">{section.title}</h4>
+                        <div className="space-y-1">
+                          {section.links.map((link) => (
+                            <Link
+                              key={link.name}
+                              href={link.href}
+                              className="flex items-center px-4 py-3 ml-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 border-l-2 border-gray-100 hover:border-blue-300"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setIsMenuOpen(false)
+                                setExpandedMobileMenu(null)
+                                // Small delay to ensure overlay clears before navigation
+                                setTimeout(() => {
+                                  router.push(link.href)
+                                }, 150)
+                              }}
+                            >
+                              {link.icon && (
+                                <div className="mr-3 w-6 h-6 bg-gray-100 rounded-lg flex items-center justify-center">
+                                  {React.createElement(link.icon, { className: "w-3 h-3" })}
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-medium text-gray-900 text-sm">{link.name}</div>
+                                {link.description && (
+                                  <div className="text-xs text-gray-500">{link.description}</div>
+                                )}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Divider */}
+            <div className="my-6 border-t border-gray-200"></div>
+
+            {/* Secondary Menu Items */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3 px-4">
+                More Resources
+              </h3>
+              <div className="space-y-1">
+                {secondaryMenuItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center px-4 py-3 rounded-xl transition-all duration-200 ${
+                      isMenuItemActive(item)
+                        ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setIsMenuOpen(false)
+                      setExpandedMobileMenu(null)
+                      setTimeout(() => {
+                        router.push(item.href)
+                      }, 150)
+                    }}
+                  >
+                    <div className="flex items-center">
+                      {item.icon && (
+                        <div className={`mr-4 w-8 h-8 rounded-lg flex items-center justify-center ${
+                          isMenuItemActive(item)
+                            ? 'bg-blue-100'
+                            : 'bg-gray-100'
+                        }`}>
+                          {React.createElement(item.icon, { className: "w-4 h-4" })}
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-semibold">{item.name}</div>
+                        {item.description && (
+                          <div className="text-sm text-gray-500">{item.description}</div>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Overlay for mobile menu */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm lg:hidden z-40"
+          onClick={() => {
+            setIsMenuOpen(false)
+            setExpandedMobileMenu(null)
+          }}
+        />
+      )}
+
+      {/* Overlay for desktop dropdowns */}
+      {(activeDropdown || showMoreMenu) && (
+        <div 
+          className="fixed inset-0 z-40"
+          onClick={() => {
+            setActiveDropdown(null)
+            setShowMoreMenu(false)
+          }}
+        />
+      )}
     </header>
   )
 }

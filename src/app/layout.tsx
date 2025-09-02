@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
         <Header />
-        <main className="min-h-screen">
+        <main className="min-h-screen pt-16">
           {children}
         </main>
         <Footer />

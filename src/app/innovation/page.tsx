@@ -7,6 +7,12 @@ import CallToActionSection from '@/components/CallToActionSection'
 export default function InnovationPage() {
   const [visibleSections, setVisibleSections] = useState<number[]>([])
   const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [forceVisible, setForceVisible] = useState(false)
+
+  // Helper function to check if a section should be visible
+  const isSectionVisible = (index: number) => {
+    return visibleSections.includes(index) || forceVisible
+  }
 
   useEffect(() => {
     // Add custom CSS for animations
@@ -66,7 +72,7 @@ export default function InnovationPage() {
           }
         })
       },
-      { threshold: 0.3, rootMargin: '0px 0px -100px 0px' }
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     )
 
     // Observe section items after component mounts
@@ -77,6 +83,48 @@ export default function InnovationPage() {
 
     return () => observer.disconnect()
   }, [])
+
+  // Handle hash navigation to ensure target section is visible
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '')
+      if (hash) {
+        const sectionIndex = innovationSections.findIndex(section => section.id === hash)
+        if (sectionIndex !== -1) {
+          setVisibleSections(prev => {
+            if (!prev.includes(sectionIndex)) {
+              return [...prev, sectionIndex]
+            }
+            return prev
+          })
+          // Force visibility for direct navigation
+          setForceVisible(true)
+          // Reset force visibility after animation
+          setTimeout(() => setForceVisible(false), 1500)
+        }
+      }
+    }
+
+    // Check hash on mount
+    handleHashChange()
+    
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange)
+    
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fallback: Make all sections visible on mobile after initial load
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768
+    if (isMobile) {
+      const timer = setTimeout(() => {
+        setForceVisible(true)
+        setVisibleSections(innovationSections.map((_, index) => index))
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const innovationSections = [
     {
@@ -394,7 +442,7 @@ export default function InnovationPage() {
 
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className={`transform transition-all duration-1000 ${
-              visibleSections.includes(index) 
+              isSectionVisible(index) 
                 ? 'translate-y-0 opacity-100' 
                 : 'translate-y-16 opacity-0'
             }`}>
@@ -436,7 +484,7 @@ export default function InnovationPage() {
                       <div
                         key={feature}
                         className={`group relative flex items-center gap-4 p-6 bg-white/60 backdrop-blur-md rounded-2xl border ${section.borderColor} shadow-lg hover:shadow-2xl hover:bg-white/80 transition-all duration-500 transform hover:-translate-y-1 ${
-                          visibleSections.includes(index) 
+                          isSectionVisible(index) 
                             ? 'translate-x-0 opacity-100' 
                             : 'translate-x-8 opacity-0'
                         }`}
